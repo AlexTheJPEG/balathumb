@@ -10,7 +10,7 @@ export default function Home() {
   useEffect(() => {
     const processImage = async () => {
       try {
-        const image = await loadImage();
+        const image = await loadImage(5);
         setProcessedImage(image);
       } catch (error) {
         console.error("Error processing image:", error);
