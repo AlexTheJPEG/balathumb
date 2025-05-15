@@ -33,8 +33,7 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
   } = useSortable({ id: `joker-${index}` });
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [clickStartTime, setClickStartTime] = useState<number | null>(null);
-  
+
   const style = {
     transform: CSS.Transform.toString(
       isDragging 
@@ -59,18 +58,10 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
     }
   };
 
-  // Handle mouse down to track potential clicks
-  const handleMouseDown = () => {
-    setClickStartTime(Date.now());
-  };
-
-  // Handle mouse up to distinguish between clicks and drags
-  const handleMouseUp = () => {
-    if (clickStartTime && (Date.now() - clickStartTime < 200)) {
-      // If less than 200ms passed, consider it a click
+  const handleClick = () => {
+    if (!isDragging) {
       onJokerClick(tJoker);
     }
-    setClickStartTime(null);
   };
 
   return (
@@ -80,8 +71,7 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsHovered(false)}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+      onClick={handleClick}
       {...attributes}
       {...listeners}
     >
@@ -125,7 +115,13 @@ export default function Home() {
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      // Define activation constraints to better distinguish between clicks and drags
+      activationConstraint: {
+        // Only start dragging after moving at least 8px
+        distance: 8,
+      }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
