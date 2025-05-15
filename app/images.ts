@@ -11,6 +11,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     for (const tJoker of jokerList) {
         let jokerImage;
 
+        // TODO: Draw editions
         if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
             const baseImage = await Jimp.read(`/jokers/${tJoker.joker.filename}.png`);
             const spriteImage = await Jimp.read(`/jokers/${tJoker.joker.filename}_sprite.png`);

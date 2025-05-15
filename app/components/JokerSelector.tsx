@@ -119,9 +119,9 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                 key={joker.id}
                 onClick={() => onSelect({
                   joker,
-                  edition: "none",
-                  sticker: "none",
-                  stake: "none"
+                  edition: "",
+                  sticker: "",
+                  stake: ""
                 } as ThumbJoker)}
                 className="cursor-pointer transition-all duration-200 flex flex-col items-center w-full h-[140px] relative"
               >

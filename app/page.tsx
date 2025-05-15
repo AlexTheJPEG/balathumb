@@ -21,7 +21,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import JokerSelector from "./components/JokerSelector";
+import JokerEditor from "./components/JokerEditor";
 import { ThumbJoker } from "./data/jokers";
+import JokerImage from "./components/JokerImage";
 
 interface SortableJokerProps {
   tJoker: ThumbJoker;
@@ -29,10 +31,11 @@ interface SortableJokerProps {
   isLoading: boolean;
   removeJoker: (index: number) => void;
   isAnyJokerDragging: boolean;
+  onJokerClick: (joker: ThumbJoker) => void;
 }
 
 // Sortable joker component
-function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDragging }: SortableJokerProps) {
+function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDragging, onJokerClick }: SortableJokerProps) {
   const {
     attributes,
     listeners,
@@ -43,6 +46,7 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
   } = useSortable({ id: `joker-${index}` });
 
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [clickStartTime, setClickStartTime] = useState<number | null>(null);
   
   const style = {
     transform: CSS.Transform.toString(
@@ -68,6 +72,20 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
     }
   };
 
+  // Handle mouse down to track potential clicks
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setClickStartTime(Date.now());
+  };
+
+  // Handle mouse up to distinguish between clicks and drags
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (clickStartTime && (Date.now() - clickStartTime < 200)) {
+      // If less than 200ms passed, consider it a click
+      onJokerClick(tJoker);
+    }
+    setClickStartTime(null);
+  };
+
   return (
     <div 
       ref={setNodeRef}
@@ -75,18 +93,12 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsHovered(false)}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       {...attributes}
       {...listeners}
     >
-      <Image
-        src={`/jokers/${tJoker.joker.filename}.png`}
-        alt={tJoker.joker.name}
-        width={73}
-        height={97}
-        quality={100}
-        unoptimized={true}
-        className={`${isLoading ? "" : "cursor-grab"} ${isDragging ? "cursor-grabbing" : ""}`}
-      />
+      <JokerImage joker={tJoker.joker} width={73} height={97} edition={tJoker.edition} />
       {/* X button - only show when hovering AND not dragging AND no other joker is being dragged */}
       {isHovered && !isLoading && !isDragging && !isAnyJokerDragging && (
         <button
@@ -122,6 +134,9 @@ export default function Home() {
   const [isAnyJokerDragging, setIsAnyJokerDragging] = useState<boolean>(false);
   const [isJokerSelectorOpen, setIsJokerSelectorOpen] = useState<boolean>(false);
   const [jokersDataPrefetched, setJokersDataPrefetched] = useState<boolean>(false);
+  const [selectedJoker, setSelectedJoker] = useState<ThumbJoker | null>(null);
+  const [selectedJokerIndex, setSelectedJokerIndex] = useState<number | null>(null);
+  const [isJokerEditorOpen, setIsJokerEditorOpen] = useState<boolean>(false);
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -195,12 +210,29 @@ export default function Home() {
   };
 
   // Handle joker selection
-  const handleJokerSelect = (joker: ThumbJoker
-  ) => {
+  const handleJokerSelect = (joker: ThumbJoker) => {
     if (jokerList.length < 5) {
       setJokerList([...jokerList, joker]);
     }
     setIsJokerSelectorOpen(false);
+  };
+
+  // Handle joker click
+  const handleJokerClick = (joker: ThumbJoker, index: number) => {
+    if (isLoading) return;
+    
+    setSelectedJoker(joker);
+    setSelectedJokerIndex(index);
+    setIsJokerEditorOpen(true);
+  };
+
+  // Handle saving joker changes
+  const handleSaveJokerChanges = (updatedJoker: ThumbJoker) => {
+    if (selectedJokerIndex !== null) {
+      const newJokerList = [...jokerList];
+      newJokerList[selectedJokerIndex] = updatedJoker;
+      setJokerList(newJokerList);
+    }
   };
 
   return (
@@ -256,6 +288,7 @@ export default function Home() {
                     isLoading={isLoading}
                     removeJoker={removeJoker}
                     isAnyJokerDragging={isAnyJokerDragging}
+                    onJokerClick={(joker) => handleJokerClick(joker, index)}
                   />
                 ))}
               </SortableContext>
@@ -288,6 +321,14 @@ export default function Home() {
         isVisible={isJokerSelectorOpen}
         onSelect={handleJokerSelect}
         onClose={() => setIsJokerSelectorOpen(false)}
+      />
+
+      {/* Joker Detail Modal */}
+      <JokerEditor
+        isVisible={isJokerEditorOpen}
+        tJoker={selectedJoker}
+        onClose={() => setIsJokerEditorOpen(false)}
+        onSave={handleSaveJokerChanges}
       />
     </main>
   );

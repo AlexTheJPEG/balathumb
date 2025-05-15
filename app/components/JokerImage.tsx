@@ -7,21 +7,23 @@ interface JokerImageProps {
   joker: Joker;
   width?: number;
   height?: number;
+  edition?: string;
 }
 
 const JokerImage: React.FC<JokerImageProps> = ({ 
   joker, 
   width = 73, 
-  height = 97 
+  height = 97,
+  edition = ""
 }) => {
-  const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename.toLowerCase());
+  const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename);
 
   if (isLegendaryJoker) {
     return (
       <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
         {/* Base image */}
-        <Image 
-          src={`/jokers/${joker.filename}.png`} 
+        <Image
+          src={`/jokers/${joker.filename}${edition ? "_" : ""}${edition}.png`}
           alt={`${joker.name} base`}
           width={width} 
           height={height}
@@ -46,7 +48,7 @@ const JokerImage: React.FC<JokerImageProps> = ({
   // Regular joker
   return (
     <Image 
-      src={`/jokers/${joker.filename}.png`} 
+      src={`/jokers/${joker.filename}${edition ? "_" : ""}${edition}.png`}
       alt={joker.name}
       width={width} 
       height={height}
