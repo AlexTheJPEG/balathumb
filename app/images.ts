@@ -1,6 +1,7 @@
 import { Jimp } from "jimp";
 import { ResizeStrategy } from "@jimp/plugin-resize";
 import { ThumbJoker, LEGENDARY_JOKERS } from "./data/jokers";
+import { getJokerLayout, calculateZOrders } from "./data/jokerLayouts";
 
 export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const bgImage = await Jimp.read("/bg/bg_green.png");
@@ -27,91 +28,11 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const baseJokerWidth = Math.floor(bgImage.width * 0.11);
     const baseJokerHeight = Math.floor(baseJokerWidth * (97/73)); // Maintain aspect ratio
     
-    interface Scale {
-        scale: number;
-        rotation: number;
-    }
-    interface Position {
-        x: number;
-        y: number;
-    }
-    let scales: Scale[] = [];
-    let positions: Position[] = [];
+    // Get layout data from shared module
+    const { scales, positions } = getJokerLayout(jokerList.length);
     
-    // Match the scaling and positioning from ThumbnailPreview
-    switch (jokerList.length) {
-        case 1:
-            scales = [{ scale: 3, rotation: 0 }];
-            positions = [{ x: 50, y: 50 }];
-            break;
-        case 2:
-            scales = [
-                { scale: 2.8, rotation: 0 },
-                { scale: 2.8, rotation: 0 }
-            ];
-            positions = [
-                { x: 30, y: 50 },
-                { x: 70, y: 50 }
-            ];
-            break;
-        case 3:
-            scales = [
-                { scale: 2.5, rotation: -5 },
-                { scale: 3, rotation: 0 },
-                { scale: 2.5, rotation: 5 }
-            ];
-            positions = [
-                { x: 25, y: 50 },
-                { x: 50, y: 50 },
-                { x: 75, y: 50 }
-            ];
-            break;
-        case 4:
-            scales = [
-                { scale: 2, rotation: -5 },
-                { scale: 2.5, rotation: 0 },
-                { scale: 2.5, rotation: 0 },
-                { scale: 2, rotation: 5 }
-            ];
-            positions = [
-                { x: 16, y: 50 },
-                { x: 35, y: 50 },
-                { x: 65, y: 50 },
-                { x: 84, y: 50 }
-            ];
-            break;
-        case 5:
-            scales = [
-                { scale: 2, rotation: -7.5 },
-                { scale: 2.3, rotation: -5 },
-                { scale: 2.5, rotation: 0 },
-                { scale: 2.3, rotation: 5 },
-                { scale: 2, rotation: 7.5 }
-            ];
-            positions = [
-                { x: 16, y: 53 },
-                { x: 33, y: 50 },
-                { x: 50, y: 50 },
-                { x: 66, y: 50 },
-                { x: 84, y: 53 }
-            ];
-            break;
-    }
-
-    // Determine z-index order for layering (higher is drawn on top)
-    const zOrders: number[] = [];
-    for (let i = 0; i < jokerList.length; i++) {
-        if (jokerList.length <= 2) {
-            zOrders.push(i + 1);
-        } else {
-            const centerIndex = Math.floor(jokerList.length / 2);
-            zOrders.push(
-                i === centerIndex 
-                    ? jokerList.length + 1  // Center card on top
-                    : jokerList.length - Math.abs(i - centerIndex)
-            );
-        }
-    }
+    // Get z-order information from shared module
+    const zOrders = calculateZOrders(jokerList.length);
 
     // Sort joker indices by z-order (lower z-order gets drawn first)
     const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i)
