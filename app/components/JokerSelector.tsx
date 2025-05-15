@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { Joker } from "../data/jokers";
 
 interface JokerSelectorProps {
   onSelect: (joker: string) => void;
@@ -10,7 +11,7 @@ interface JokerSelectorProps {
 }
 
 export default function JokerSelector({ onSelect, onClose, isVisible }: JokerSelectorProps) {
-  const [jokers, setJokers] = useState<string[]>([]);
+  const [jokers, setJokers] = useState<Joker[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -58,20 +59,20 @@ export default function JokerSelector({ onSelect, onClose, isVisible }: JokerSel
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
             {jokers.map((joker) => (
               <div 
-                key={joker} 
+                key={joker.id} 
                 className="cursor-pointer hover:opacity-80 transition-opacity transform hover:scale-105 duration-200"
-                onClick={() => onSelect(joker)}
+                onClick={() => onSelect(joker.filename)}
               >
                 <Image
-                  src={`/jokers/${joker}.png`}
-                  alt={joker}
+                  src={`/jokers/${joker.filename}.png`}
+                  alt={joker.name}
                   width={73}
                   height={97}
                   quality={100}
                   unoptimized={true}
                   className="mx-auto"
                 />
-                <p className="text-center text-sm mt-1 truncate">{joker}</p>
+                <p className="text-center text-sm mt-1 truncate">{joker.name}</p>
               </div>
             ))}
           </div>

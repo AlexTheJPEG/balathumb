@@ -1,24 +1,20 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { jokers } from '@/app/data/jokers';
 
 export async function GET() {
   try {
-    // Get the absolute path to the jokers directory
-    const jokersDirectory = path.join(process.cwd(), 'public', 'jokers');
+    // Get joker data from the jokers.ts file
+    const jokerData = jokers.map(joker => ({
+      id: joker.id,
+      filename: joker.filename,
+      name: joker.name,
+      effect: joker.effect
+    }));
     
-    // Read the directory
-    const fileNames = fs.readdirSync(jokersDirectory);
-    
-    // Filter out non-PNG files and remove .png extension
-    const jokers = fileNames
-      .filter(file => file.endsWith('.png'))
-      .map(file => file.replace('.png', ''));
-    
-    // Return the list of jokers
-    return NextResponse.json({ jokers });
+    // Return the list of jokers with their data
+    return NextResponse.json({ jokers: jokerData });
   } catch (error) {
-    console.error('Error reading jokers directory:', error);
+    console.error('Error retrieving joker data:', error);
     return NextResponse.json(
       { error: 'Failed to load jokers' },
       { status: 500 }
