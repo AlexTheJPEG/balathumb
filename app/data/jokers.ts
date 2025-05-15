@@ -8,7 +8,7 @@ export interface Joker {
 export interface ThumbJoker {
     joker: Joker;
     edition: string;
-    sticker: string;
+    sticker: Set<string>;
     stake: string;
 }
 

@@ -10,6 +10,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const jokerImages = [];
     for (const tJoker of jokerList) {
         let jokerImage;
+        let finalJokerImage;
 
         const edition = tJoker.edition ? `_${tJoker.edition}` : "";
         if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
@@ -21,7 +22,18 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
             jokerImage = await Jimp.read(`/jokers/${tJoker.joker.filename}${edition}.png`);
         }
 
-        jokerImages.push(jokerImage);
+        // Add stickers
+        finalJokerImage = jokerImage.clone();
+        for (const sticker of tJoker.sticker) {
+            const stickerImage = await Jimp.read(`/stickers/${sticker}.png`);
+            finalJokerImage.composite(stickerImage, 0, 0);
+        }
+        if (tJoker.stake) {
+            const stakeImage = await Jimp.read(`/stickers/${tJoker.stake}.png`);
+            finalJokerImage.composite(stakeImage, 0, 0);
+        }
+
+        jokerImages.push(finalJokerImage);
     }
 
     // Base sizes and positions calculations

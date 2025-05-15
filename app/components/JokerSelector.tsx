@@ -110,7 +110,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                                     onSelect({
                                         joker,
                                         edition: "",
-                                        sticker: "",
+                                        sticker: new Set(),
                                         stake: "",
                                     } as ThumbJoker)
                                 }
@@ -118,7 +118,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                             >
                                 <div className="absolute inset-0 flex flex-col items-center transition-transform duration-200 hover:scale-105 hover:transform">
                                     <div className="flex h-[97px] w-full items-center justify-center">
-                                        <JokerImage joker={joker} />
+                                        <JokerImage joker={joker} sticker={new Set()} />
                                     </div>
                                     <div className="mt-2 flex h-[43px] w-full items-start justify-center overflow-hidden">
                                         <p className="w-full px-1 text-center text-sm" title={joker.name}>

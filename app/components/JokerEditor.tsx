@@ -17,7 +17,15 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
     // Update local state when joker changes
     useEffect(() => {
         if (tJoker) {
-            setLocalJoker({ ...tJoker });
+            // Ensure sticker is always a Set by converting it if needed
+            const sticker = tJoker.sticker instanceof Set 
+                ? new Set(tJoker.sticker) 
+                : new Set(Array.isArray(tJoker.sticker) ? tJoker.sticker : []);
+                
+            setLocalJoker({ 
+                ...tJoker,
+                sticker,
+            });
         }
     }, [tJoker]);
 
@@ -56,7 +64,7 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                 <div className="flex gap-8">
                     {/* Joker image on the left */}
                     <div className="flex-shrink-0">
-                        <JokerImage joker={tJoker.joker} width={146} height={194} edition={localJoker.edition} />
+                        <JokerImage joker={tJoker.joker} width={146} height={194} edition={localJoker.edition} sticker={localJoker.sticker} stake={localJoker.stake}/>
                     </div>
 
                     {/* Settings on the right */}
@@ -76,20 +84,67 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                             </select>
                         </div>
 
+                        {/* Sticker selection */}
                         <div>
                             <label className="mb-1 block text-sm font-medium text-gray-300">Sticker</label>
-                            <select
-                                value={localJoker.sticker}
-                                onChange={(e) => setLocalJoker({ ...localJoker, sticker: e.target.value })}
-                                className="w-full rounded-md bg-gray-700 px-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            >
-                                <option value="">None</option>
-                                <option value="eternal">Eternal</option>
-                                <option value="perishable">Perishable</option>
-                                <option value="rental">Rental</option>
-                            </select>
+                            <div className="space-y-2 mt-1">
+                                <label className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={localJoker.sticker.has("eternal")}
+                                        onChange={() => {
+                                            const newSticker = new Set(localJoker.sticker);
+                                            if (newSticker.has("eternal")) {
+                                                newSticker.delete("eternal");
+                                            } else {
+                                                newSticker.add("eternal");
+                                                newSticker.delete("perishable");
+                                            }
+                                            setLocalJoker({ ...localJoker, sticker: newSticker });
+                                        }}
+                                        className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-white">Eternal</span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={localJoker.sticker.has("perishable")}
+                                        onChange={() => {
+                                            const newSticker = new Set(localJoker.sticker);
+                                            if (newSticker.has("perishable")) {
+                                                newSticker.delete("perishable");
+                                            } else {
+                                                newSticker.add("perishable");
+                                                newSticker.delete("eternal");
+                                            }
+                                            setLocalJoker({ ...localJoker, sticker: newSticker });
+                                        }}
+                                        className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-white">Perishable</span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        checked={localJoker.sticker.has("rental")}
+                                        onChange={() => {
+                                            const newSticker = new Set(localJoker.sticker);
+                                            if (newSticker.has("rental")) {
+                                                newSticker.delete("rental");
+                                            } else {
+                                                newSticker.add("rental");
+                                            }
+                                            setLocalJoker({ ...localJoker, sticker: newSticker });
+                                        }}
+                                        className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-white">Rental</span>
+                                </label>
+                            </div>
                         </div>
 
+                        {/* Stake sticker selection */}
                         <div>
                             <label className="mb-1 block text-sm font-medium text-gray-300">Stake</label>
                             <select

@@ -21,7 +21,6 @@ const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, width = 
         <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
             {/* Background image */}
             <Image
-                // TODO: More backgrounds
                 src="/bg/bg_green.png"
                 alt="Background"
                 width={width}
@@ -56,6 +55,8 @@ const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, width = 
                             width={jokerWidth}
                             height={jokerHeight}
                             edition={tJoker.edition}
+                            sticker={tJoker.sticker}
+                            stake={tJoker.stake}
                         />
                     </div>
                 );
