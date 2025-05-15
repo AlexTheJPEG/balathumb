@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Fuse from 'fuse.js';
 import { Joker } from "../data/jokers";
+import JokerImage from "./JokerImage";
 
 interface JokerSelectorProps {
   isVisible: boolean;
@@ -15,6 +15,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
   const [jokers, setJokers] = useState<Joker[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Create a memoized Fuse instance
   const fuse = useMemo(() => {
@@ -50,6 +51,16 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
         });
     }
   }, [isVisible, jokers.length]);
+
+  // Add this effect to focus the search input when the modal becomes visible
+  useEffect(() => {
+    if (isVisible && searchInputRef.current) {
+      // Short timeout to ensure the modal is fully rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isVisible]);
 
   // Get filtered jokers using fuzzy search
   const filteredJokers = useMemo(() => {
@@ -88,6 +99,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
         {/* Search box */}
         <div className="mb-4">
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search by name or effect..."
             value={searchQuery}
@@ -112,14 +124,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                   className="absolute inset-0 hover:transform hover:scale-105 transition-transform duration-200 flex flex-col items-center"
                 >
                   <div className="flex justify-center items-center w-full h-[97px]">
-                    <Image 
-                      src={`/jokers/${joker.filename}.png`} 
-                      alt={joker.name}
-                      width={73} 
-                      height={97}
-                      quality={100}
-                      unoptimized={true}
-                    />
+                    <JokerImage joker={joker} />
                   </div>
                   <div className="mt-2 h-[43px] flex items-start justify-center w-full overflow-hidden">
                     <p className="text-center text-sm w-full px-1" title={joker.name}>

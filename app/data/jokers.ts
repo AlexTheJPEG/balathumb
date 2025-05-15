@@ -5,6 +5,8 @@ export interface Joker {
   effect: string;
 }
 
+export const LEGENDARY_JOKERS = ["canio", "chicot", "perkeo", "triboulet", "yorick"];
+
 export const jokers: Joker[] = [
   {
     "id": 1,

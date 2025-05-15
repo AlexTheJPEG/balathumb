@@ -1,5 +1,6 @@
 import { Jimp } from "jimp";
 import { ResizeStrategy } from "@jimp/plugin-resize";
+import { LEGENDARY_JOKERS } from "./data/jokers";
 
 export async function loadImage(jokerList: string[]): Promise<string> {
     const bgImage = await Jimp.read("/bg/bg_green.png");
@@ -8,7 +9,17 @@ export async function loadImage(jokerList: string[]): Promise<string> {
 
     const jokerImages = [];
     for (const joker of jokerList) {
-        const jokerImage = await Jimp.read(`/jokers/${joker}.png`);
+        let jokerImage;
+
+        if (LEGENDARY_JOKERS.includes(joker)) {
+            const baseImage = await Jimp.read(`/jokers/${joker}.png`);
+            const spriteImage = await Jimp.read(`/jokers/${joker}_sprite.png`);
+            jokerImage = baseImage.clone();
+            jokerImage.composite(spriteImage, 0, 0);
+        } else {
+            jokerImage = await Jimp.read(`/jokers/${joker}.png`);
+        }
+        
         jokerImages.push(jokerImage);
     }
 
