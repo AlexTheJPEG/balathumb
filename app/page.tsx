@@ -120,6 +120,7 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [isAnyJokerDragging, setIsAnyJokerDragging] = useState<boolean>(false);
   const [isJokerSelectorOpen, setIsJokerSelectorOpen] = useState<boolean>(false);
+  const [jokersDataPrefetched, setJokersDataPrefetched] = useState<boolean>(false);
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -128,6 +129,22 @@ export default function Home() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  // Add this new useEffect for prefetching
+  useEffect(() => {
+    // Prefetch joker data when component mounts
+    const prefetchJokerData = async () => {
+      try {
+        // Make a request to your API endpoint
+        await fetch('/api/jokers');
+        setJokersDataPrefetched(true);
+      } catch (error) {
+        console.error('Error prefetching joker data:', error);
+      }
+    };
+    
+    prefetchJokerData();
+  }, []);
 
   // Whenever the joker list changes, regenerate the preview image
   useEffect(() => {
