@@ -76,6 +76,7 @@ export async function loadImage(numJokers: number = 1): Promise<string> {
             result.composite(joker4, x4, y4);
             result.composite(joker2, x2, y2);
             result.composite(joker3, x3, y3);
+            break;
         case 5:
             joker1.scaleToFit({ w: 600, h: 600, mode: ResizeStrategy.NEAREST_NEIGHBOR });
             joker1.rotate(7.5);
