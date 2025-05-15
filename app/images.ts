@@ -6,8 +6,8 @@ export async function loadImage(jokerList: string[]): Promise<string> {
 
     const result = bgImage.clone();
 
-    let jokerImages = [];
-    for (let joker of jokerList) {
+    const jokerImages = [];
+    for (const joker of jokerList) {
         const jokerImage = await Jimp.read(`/jokers/${joker}.png`);
         jokerImages.push(jokerImage);
     }

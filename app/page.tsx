@@ -11,7 +11,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -91,10 +90,9 @@ function SortableJoker({ joker, index, isLoading, removeJoker, isAnyJokerDraggin
       {isHovered && !isLoading && !isDragging && !isAnyJokerDragging && (
         <button
           onClick={(e) => {
+            // Prevent drag from starting when clicking the remove button
             e.stopPropagation();
             e.preventDefault();
-            // Prevent the event from triggering a drag
-            listeners?.onClick && e.stopPropagation();
             removeJoker(index);
           }}
           onMouseDown={(e) => {
@@ -158,7 +156,7 @@ export default function Home() {
   };
 
   // Handle drag start event
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = () => {
     setIsAnyJokerDragging(true);
   };
 
