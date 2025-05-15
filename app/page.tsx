@@ -235,7 +235,7 @@ export default function Home() {
             </DndContext>
             
             {jokerList.length < 5 && <Image
-              src="/jokers/add.png"
+              src="/add.png"
               alt="Add Joker"
               width={73}
               height={97}
