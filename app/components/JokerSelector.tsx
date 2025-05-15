@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import Fuse from 'fuse.js';
-import { Joker } from "../data/jokers";
+import { ThumbJoker, Joker } from "../data/jokers";
 import JokerImage from "./JokerImage";
 
 interface JokerSelectorProps {
   isVisible: boolean;
-  onSelect: (id: string) => void;
+  onSelect: (joker: ThumbJoker) => void;
   onClose: () => void;
 }
 
@@ -117,7 +117,12 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
             {filteredJokers.map(joker => (
               <div 
                 key={joker.id}
-                onClick={() => onSelect(joker.filename)}
+                onClick={() => onSelect({
+                  joker,
+                  edition: "none",
+                  sticker: "none",
+                  stake: "none"
+                } as ThumbJoker)}
                 className="cursor-pointer transition-all duration-200 flex flex-col items-center w-full h-[140px] relative"
               >
                 <div 

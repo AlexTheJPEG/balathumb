@@ -1,23 +1,23 @@
 import { Jimp } from "jimp";
 import { ResizeStrategy } from "@jimp/plugin-resize";
-import { LEGENDARY_JOKERS } from "./data/jokers";
+import { ThumbJoker, LEGENDARY_JOKERS } from "./data/jokers";
 
-export async function loadImage(jokerList: string[]): Promise<string> {
+export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const bgImage = await Jimp.read("/bg/bg_green.png");
 
     const result = bgImage.clone();
 
     const jokerImages = [];
-    for (const joker of jokerList) {
+    for (const tJoker of jokerList) {
         let jokerImage;
 
-        if (LEGENDARY_JOKERS.includes(joker)) {
-            const baseImage = await Jimp.read(`/jokers/${joker}.png`);
-            const spriteImage = await Jimp.read(`/jokers/${joker}_sprite.png`);
+        if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
+            const baseImage = await Jimp.read(`/jokers/${tJoker.joker.filename}.png`);
+            const spriteImage = await Jimp.read(`/jokers/${tJoker.joker.filename}_sprite.png`);
             jokerImage = baseImage.clone();
             jokerImage.composite(spriteImage, 0, 0);
         } else {
-            jokerImage = await Jimp.read(`/jokers/${joker}.png`);
+            jokerImage = await Jimp.read(`/jokers/${tJoker.joker.filename}.png`);
         }
         
         jokerImages.push(jokerImage);

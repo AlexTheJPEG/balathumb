@@ -5,6 +5,13 @@ export interface Joker {
   effect: string;
 }
 
+export interface ThumbJoker {
+  joker: Joker;
+  edition: string;
+  sticker: string;
+  stake: string;
+}
+
 export const LEGENDARY_JOKERS = ["canio", "chicot", "perkeo", "triboulet", "yorick"];
 
 export const jokers: Joker[] = [

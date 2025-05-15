@@ -21,9 +21,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import JokerSelector from "./components/JokerSelector";
+import { ThumbJoker } from "./data/jokers";
 
 interface SortableJokerProps {
-  joker: string;
+  tJoker: ThumbJoker;
   index: number;
   isLoading: boolean;
   removeJoker: (index: number) => void;
@@ -31,7 +32,7 @@ interface SortableJokerProps {
 }
 
 // Sortable joker component
-function SortableJoker({ joker, index, isLoading, removeJoker, isAnyJokerDragging }: SortableJokerProps) {
+function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDragging }: SortableJokerProps) {
   const {
     attributes,
     listeners,
@@ -78,8 +79,8 @@ function SortableJoker({ joker, index, isLoading, removeJoker, isAnyJokerDraggin
       {...listeners}
     >
       <Image
-        src={`/jokers/${joker}.png`}
-        alt={joker}
+        src={`/jokers/${tJoker.joker.filename}.png`}
+        alt={tJoker.joker.name}
         width={73}
         height={97}
         quality={100}
@@ -115,7 +116,7 @@ function SortableJoker({ joker, index, isLoading, removeJoker, isAnyJokerDraggin
 
 export default function Home() {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [jokerList, setJokerList] = useState<string[]>([]);
+  const [jokerList, setJokerList] = useState<ThumbJoker[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [isAnyJokerDragging, setIsAnyJokerDragging] = useState<boolean>(false);
@@ -194,7 +195,8 @@ export default function Home() {
   };
 
   // Handle joker selection
-  const handleJokerSelect = (joker: string) => {
+  const handleJokerSelect = (joker: ThumbJoker
+  ) => {
     if (jokerList.length < 5) {
       setJokerList([...jokerList, joker]);
     }
@@ -248,8 +250,8 @@ export default function Home() {
               >
                 {jokerList.map((joker, index) => (
                   <SortableJoker
-                    key={`joker-${index}`} 
-                    joker={joker}
+                    key={`joker-${index}`}
+                    tJoker={joker}
                     index={index}
                     isLoading={isLoading}
                     removeJoker={removeJoker}
