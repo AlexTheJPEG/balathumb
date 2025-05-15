@@ -9,6 +9,7 @@ import JokerEditor from "./components/JokerEditor";
 import { ThumbJoker } from "./data/jokers";
 import JokerImage from "./components/JokerImage";
 import ThumbnailPreview from "./components/ThumbnailPreview";
+import { loadImage } from "./images";
 
 interface SortableJokerProps {
   tJoker: ThumbJoker;
@@ -119,6 +120,7 @@ export default function Home() {
   const [selectedJoker, setSelectedJoker] = useState<ThumbJoker | null>(null);
   const [selectedJokerIndex, setSelectedJokerIndex] = useState<number | null>(null);
   const [isJokerEditorOpen, setIsJokerEditorOpen] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -195,18 +197,61 @@ export default function Home() {
     }
   };
 
+  // Add this function to handle image generation
+  const handleGenerateImage = async () => {
+    if (jokerList.length === 0) {
+      alert("Please add at least one joker to generate a thumbnail.");
+      return;
+    }
+    
+    setIsGenerating(true);
+    
+    try {
+      // Use the existing loadImage function
+      const base64Image = await loadImage(jokerList);
+      
+      // Create a download link
+      const downloadLink = document.createElement('a');
+      downloadLink.href = base64Image;
+      downloadLink.download = `balathumb-${Date.now()}.png`;
+      
+      // Append to body, click to trigger download, then remove
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate image. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-24">
       <h1 className="text-5xl font-bold">Balathumb</h1>
 
       {/* User interface */}
       <div className="mt-16 flex items-start -ml-64">
-        <div className="relative mr-8">
+        <div className="relative mr-8 flex flex-col items-center">
           <ThumbnailPreview 
             jokerList={jokerList}
             width={640}
             height={360}
           />
+          
+          {/* Generate button */}
+          <button 
+            onClick={handleGenerateImage}
+            disabled={isGenerating || jokerList.length === 0}
+            className={`mt-4 px-6 py-2 rounded-md text-white font-semibold ${
+              isGenerating || jokerList.length === 0 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            } transition-colors`}
+          >
+            {isGenerating ? 'Generating...' : 'Generate Thumbnail'}
+          </button>
         </div>
         
         {/* Card organization */}
