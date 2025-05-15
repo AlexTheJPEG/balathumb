@@ -252,6 +252,7 @@ export default function Home() {
           >
             {isGenerating ? 'Generating...' : 'Generate Thumbnail'}
           </button>
+          <p className="text-gray-500 mt-2">Note: Generated thumbnail may differ slightly from the preview</p>
         </div>
         
         {/* Card organization */}
