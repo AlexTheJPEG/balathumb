@@ -21,6 +21,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import JokerSelector from "./components/JokerSelector";
 
 interface SortableJokerProps {
   joker: string;
@@ -116,10 +117,11 @@ function SortableJoker({ joker, index, isLoading, removeJoker, isAnyJokerDraggin
 
 export default function Home() {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [jokerList, setJokerList] = useState<string[]>(["photograph", "square_joker", "wee_joker", "to_do_list", "joker"]);
+  const [jokerList, setJokerList] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const [isAnyJokerDragging, setIsAnyJokerDragging] = useState<boolean>(false);
+  const [isJokerSelectorOpen, setIsJokerSelectorOpen] = useState<boolean>(false);
 
   // Configure sensors for drag and drop
   const sensors = useSensors(
@@ -174,6 +176,14 @@ export default function Home() {
         return arrayMove(items, oldIndex, newIndex);
       });
     }
+  };
+
+  // Handle joker selection
+  const handleJokerSelect = (joker: string) => {
+    if (jokerList.length < 5) {
+      setJokerList([...jokerList, joker]);
+    }
+    setIsJokerSelectorOpen(false);
   };
 
   return (
@@ -244,7 +254,7 @@ export default function Home() {
               className={`${isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"}`}
               onClick={() => {
                 if (isLoading) return;
-                setJokerList([...jokerList, "joker"])
+                setIsJokerSelectorOpen(true);
               }}
             />}
 
@@ -255,6 +265,13 @@ export default function Home() {
           </div>
         </div>
       </div>)}
+
+      {/* Joker Selector Modal */}
+      <JokerSelector 
+        isVisible={isJokerSelectorOpen}
+        onSelect={handleJokerSelect}
+        onClose={() => setIsJokerSelectorOpen(false)}
+      />
     </main>
   );
 }
