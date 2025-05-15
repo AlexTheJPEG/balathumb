@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import Fuse from 'fuse.js';
 import { Joker } from "../data/jokers";
 
 interface JokerSelectorProps {
@@ -13,6 +14,17 @@ interface JokerSelectorProps {
 const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onClose }) => {
   const [jokers, setJokers] = useState<Joker[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Create a memoized Fuse instance
+  const fuse = useMemo(() => {
+    return new Fuse(jokers, {
+      keys: ['name', 'effect'],
+      threshold: 0.3,
+      ignoreLocation: false,
+      useExtendedSearch: false
+    });
+  }, [jokers]);
 
   // Add this function to handle clicking outside the modal
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -39,7 +51,14 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
     }
   }, [isVisible, jokers.length]);
 
-  // Add transition classes to make the modal appear smoothly
+  // Get filtered jokers using fuzzy search
+  const filteredJokers = useMemo(() => {
+    if (!searchQuery.trim()) return jokers;
+    
+    const results = fuse.search(searchQuery);
+    return results.map(result => result.item);
+  }, [fuse, searchQuery, jokers]);
+
   return (
     <div 
       className={`
@@ -47,11 +66,11 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
         transition-opacity duration-200 ease-in-out
         ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}
-      onClick={handleBackdropClick} // Add click handler here
+      onClick={handleBackdropClick}
     >
       <div 
         className={`
-          bg-gray-800 rounded-lg p-6 max-w-3xl max-h-[80vh] overflow-auto
+          bg-gray-800 rounded-lg p-6 max-w-3xl w-[700px] max-h-[80vh] overflow-auto
           transition-transform duration-200 ease-in-out
           ${isVisible ? 'transform scale-100' : 'transform scale-95'}
         `}
@@ -66,33 +85,58 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
         
         <h2 className="text-2xl font-bold mb-4">Select a Joker</h2>
         
+        {/* Search box */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by name or effect..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        
         {isLoading ? (
-          <div className="flex justify-center p-12">
+          <div className="flex justify-center p-12 min-h-[400px] items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-5 gap-6">
-            {jokers.map(joker => (
+          <div className="grid grid-cols-5 gap-6 min-h-[400px]">
+            {filteredJokers.map(joker => (
               <div 
                 key={joker.id}
                 onClick={() => onSelect(joker.filename)}
-                className="cursor-pointer hover:scale-105 transition-transform flex flex-col items-center"
+                className="cursor-pointer transition-all duration-200 flex flex-col items-center w-full h-[140px] relative"
               >
-                <div className="flex justify-center w-full h-[97px]">
-                  <Image 
-                    src={`/jokers/${joker.filename}.png`} 
-                    alt={joker.name}
-                    width={73} 
-                    height={97}
-                    quality={100}
-                    unoptimized={true}
-                  />
+                <div 
+                  className="absolute inset-0 hover:transform hover:scale-105 transition-transform duration-200 flex flex-col items-center"
+                >
+                  <div className="flex justify-center items-center w-full h-[97px]">
+                    <Image 
+                      src={`/jokers/${joker.filename}.png`} 
+                      alt={joker.name}
+                      width={73} 
+                      height={97}
+                      quality={100}
+                      unoptimized={true}
+                    />
+                  </div>
+                  <div className="mt-2 h-[43px] flex items-start justify-center w-full overflow-hidden">
+                    <p className="text-center text-sm w-full px-1" title={joker.name}>
+                      {joker.name}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-center text-sm mt-2 w-full truncate px-1" title={joker.name}>
-                  {joker.name}
-                </p>
               </div>
             ))}
+            
+            {!isLoading && filteredJokers.length === 0 && (
+              <div className="col-span-5 flex items-center justify-center h-full">
+                <p className="text-center py-8 text-gray-400">
+                  No jokers match your search.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
