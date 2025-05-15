@@ -10,6 +10,7 @@ import { ThumbJoker } from "./data/jokers";
 import JokerImage from "./components/JokerImage";
 import ThumbnailPreview from "./components/ThumbnailPreview";
 import { loadImage } from "./images";
+import Image from "next/image";
 
 interface SortableJokerProps {
   tJoker: ThumbJoker;
@@ -59,12 +60,12 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
   };
 
   // Handle mouse down to track potential clicks
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = () => {
     setClickStartTime(Date.now());
   };
 
   // Handle mouse up to distinguish between clicks and drags
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handleMouseUp = () => {
     if (clickStartTime && (Date.now() - clickStartTime < 200)) {
       // If less than 200ms passed, consider it a click
       onJokerClick(tJoker);
@@ -283,8 +284,9 @@ export default function Home() {
                 ))}
               </SortableContext>
             </DndContext>
-            
-            {jokerList.length < 5 && <img
+
+            {jokerList.length < 5 && (
+              <Image
               src="/add.png"
               alt="Add Joker"
               width={73}
@@ -293,7 +295,8 @@ export default function Home() {
               onClick={() => {
                 setIsJokerSelectorOpen(true);
               }}
-            />}
+              />
+            )}
 
             {/* Add invisible placeholder jokers to maintain layout */}
             {Array.from({ length: Math.max(0, 5 - jokerList.length - (jokerList.length < 5 ? 1 : 0)) }).map((_, index) => (

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { ThumbJoker } from "../data/jokers";
 import JokerImage from "./JokerImage";
-import { useState, useEffect } from "react";
 import { getJokerLayout, calculateZOrders } from "../data/jokerLayouts";
 
 interface ThumbnailPreviewProps {
