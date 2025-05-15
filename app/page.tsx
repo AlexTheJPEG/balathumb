@@ -44,6 +44,8 @@ function SortableJoker({ tJoker, index, isLoading, removeJoker, isAnyJokerDraggi
     transition: isAnyJokerDragging ? transition : undefined,
     zIndex: isDragging ? 10 : 1,
     opacity: isDragging ? 0.8 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+
   };
 
   useEffect(() => {
