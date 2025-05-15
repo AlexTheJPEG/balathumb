@@ -6,8 +6,7 @@ import { loadImage } from "./images";
 
 export default function Home() {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [numJokers, setNumJokers] = useState<number>(1);
-  const [jokerList, setJokerList] = useState<string[]>(["joker"]);
+  const [jokerList, setJokerList] = useState<string[]>(["photograph", "square_joker", "wee_joker", "to_do_list", "joker"]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
 
@@ -15,7 +14,7 @@ export default function Home() {
     const processImage = async () => {
       setIsLoading(true);
       try {
-        const image = await loadImage(numJokers);
+        const image = await loadImage(jokerList);
         setProcessedImage(image);
       } catch (error) {
         console.error("Error processing image:", error);
@@ -26,7 +25,7 @@ export default function Home() {
     };
 
     processImage();
-  }, [numJokers, jokerList]);
+  }, [jokerList]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-24">
@@ -71,23 +70,24 @@ export default function Home() {
                 width={73}
                 height={97}
                 quality={100}
+                unoptimized={true}
               />
             ))}
-            {numJokers < 5 && <Image
+            {jokerList.length < 5 && <Image
               src="/jokers/add.png"
               alt="Add Joker"
               width={73}
               height={97}
               quality={100}
+              unoptimized={true}
               className={`${isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"}`}
               onClick={() => {
                 if (isLoading) return;
                 setJokerList([...jokerList, "joker"])
-                setNumJokers(numJokers + 1);
               }}
             />}
             {/* Add invisible placeholder jokers to maintain layout */}
-            {Array.from({ length: Math.max(0, 5 - numJokers - (numJokers < 5 ? 1 : 0)) }).map((_, index) => (
+            {Array.from({ length: Math.max(0, 5 - jokerList.length - (jokerList.length < 5 ? 1 : 0)) }).map((_, index) => (
               <div key={`placeholder-${index}`} className="w-[73px] h-[97px] invisible" />
             ))}
           </div>
