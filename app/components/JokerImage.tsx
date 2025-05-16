@@ -44,42 +44,6 @@ interface JokerImageProps {
     stake?: string;
 }
 
-const StickerOverlays: React.FC<{ sticker: Set<string>; stake: string; width: number; height: number }> = ({
-    sticker,
-    stake,
-    width,
-    height,
-}) => (
-    <>
-        {/* Stickers */}
-        {Array.from(sticker).map((s, index) => (
-            <Image
-                key={index}
-                src={`/stickers/${s}.png`}
-                alt={s}
-                width={width}
-                height={height}
-                quality={100}
-                unoptimized={true}
-                className="absolute top-0 left-0"
-            />
-        ))}
-
-        {/* Stake stickers */}
-        {stake && (
-            <Image
-                src={`/stickers/${stake}.png`}
-                alt={stake}
-                width={width}
-                height={height}
-                quality={100}
-                unoptimized={true}
-                className="absolute top-0 left-0"
-            />
-        )}
-    </>
-);
-
 const JokerImage: React.FC<JokerImageProps> = ({
     joker,
     width = 73,
@@ -100,7 +64,7 @@ const JokerImage: React.FC<JokerImageProps> = ({
             <div
                 className="absolute top-0 left-0"
                 style={getSpriteStyle}
-                aria-label={`${joker.name}${isLegendaryJoker ? ' base' : ''}`}
+                aria-label={`${joker.name}${isLegendaryJoker ? " base" : ""}`}
             />
 
             {/* Sprite overlay for legendary jokers */}
@@ -116,8 +80,27 @@ const JokerImage: React.FC<JokerImageProps> = ({
                 />
             )}
 
-            {/* Common sticker overlays */}
-            <StickerOverlays sticker={sticker} stake={stake} width={width} height={height} />
+            {/* Stickers and stakes */}
+            {[...sticker, stake].filter(Boolean).map((s, index) => (
+                <Image
+                    key={index}
+                    src={`/stickers/${
+                        joker.id === 16
+                            ? `exceptions/half_joker_${s}`
+                            : joker.id === 65
+                              ? `exceptions/square_joker_${s}`
+                              : joker.id === 78
+                                ? `exceptions/photograph_${s}`
+                                : s
+                    }.png`}
+                    alt={s}
+                    width={width}
+                    height={height}
+                    quality={100}
+                    unoptimized={true}
+                    className="absolute top-0 left-0"
+                />
+            ))}
         </div>
     );
 };
