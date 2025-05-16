@@ -56,21 +56,25 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
 
     return (
         <div
-            className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-200 ease-in-out ${isVisible ? "opacity-100" : "pointer-events-none opacity-0"} `}
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200 ease-in-out ${
+                isVisible ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
             onClick={handleBackdropClick}
         >
             <div
-                className={`max-h-[80vh] w-[700px] max-w-3xl overflow-auto rounded-lg bg-gray-800 p-6 transition-transform duration-200 ease-in-out ${isVisible ? "scale-100 transform" : "scale-95 transform"} `}
+                className={`max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-gray-800 p-4 sm:p-6 transition-transform duration-200 ease-in-out ${
+                    isVisible ? "scale-100 transform" : "scale-95 transform"
+                }`}
             >
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-3xl leading-none text-gray-400 hover:text-white"
+                    className="absolute top-2 right-2 sm:top-4 sm:right-4 text-3xl leading-none text-gray-400 hover:text-white"
                 >
                     ×
                 </button>
 
-                <h2 className="mb-4 text-2xl font-bold">Select a Joker</h2>
+                <h2 className="mb-4 text-xl sm:text-2xl font-bold">Select a Joker</h2>
 
                 {/* Search box */}
                 <div className="mb-4">
@@ -80,12 +84,12 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                         placeholder="Search by name or effect..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full rounded-md bg-gray-700 px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full rounded-md bg-gray-700 px-3 py-2 sm:px-4 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                 </div>
 
                 {/* Joker grid */}
-                <div className="grid min-h-[400px] grid-cols-5 gap-6">
+                <div className="grid min-h-[300px] sm:min-h-[400px] grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
                     {filteredJokers.map((joker) => (
                         <div
                             key={joker.id}
@@ -97,14 +101,17 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                                     stake: "",
                                 } as ThumbJoker)
                             }
-                            className="relative flex h-[140px] w-full cursor-pointer flex-col items-center transition-all duration-200"
+                            className="relative flex h-[120px] sm:h-[140px] w-full cursor-pointer flex-col items-center transition-all duration-200"
                         >
                             <div className="absolute inset-0 flex flex-col items-center transition-transform duration-200 hover:scale-105 hover:transform">
-                                <div className="flex h-[97px] w-full items-center justify-center">
+                                <div className="flex h-[77px] sm:h-[97px] w-full items-center justify-center">
                                     <JokerImage joker={joker} sticker={new Set()} />
                                 </div>
-                                <div className="mt-2 flex h-[43px] w-full items-start justify-center overflow-hidden">
-                                    <p className="w-full px-1 text-center text-sm" title={joker.name}>
+                                <div className="mt-1 sm:mt-2 flex h-[43px] w-full items-start justify-center overflow-hidden">
+                                    <p
+                                        className="w-full px-1 text-center text-xs sm:text-sm py-1 sm:py-2"
+                                        title={joker.name}
+                                    >
                                         {joker.name}
                                     </p>
                                 </div>
@@ -113,8 +120,8 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                     ))}
 
                     {filteredJokers.length === 0 && (
-                        <div className="col-span-5 flex h-full items-center justify-center">
-                            <p className="py-8 text-center text-gray-400">No jokers match your search.</p>
+                        <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 flex h-full items-center justify-center">
+                            <p className="py-4 sm:py-8 text-center text-gray-400">No jokers match your search.</p>
                         </div>
                     )}
                 </div>
