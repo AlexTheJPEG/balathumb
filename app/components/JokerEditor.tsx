@@ -18,11 +18,12 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
     useEffect(() => {
         if (tJoker) {
             // Ensure sticker is always a Set by converting it if needed
-            const sticker = tJoker.sticker instanceof Set 
-                ? new Set(tJoker.sticker) 
-                : new Set(Array.isArray(tJoker.sticker) ? tJoker.sticker : []);
-                
-            setLocalJoker({ 
+            const sticker =
+                tJoker.sticker instanceof Set
+                    ? new Set(tJoker.sticker)
+                    : new Set(Array.isArray(tJoker.sticker) ? tJoker.sticker : []);
+
+            setLocalJoker({
                 ...tJoker,
                 sticker,
             });
@@ -64,7 +65,14 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                 <div className="flex gap-8">
                     {/* Joker image on the left */}
                     <div className="flex-shrink-0">
-                        <JokerImage joker={tJoker.joker} width={146} height={194} edition={localJoker.edition} sticker={localJoker.sticker} stake={localJoker.stake}/>
+                        <JokerImage
+                            joker={tJoker.joker}
+                            width={146}
+                            height={194}
+                            edition={localJoker.edition}
+                            sticker={localJoker.sticker}
+                            stake={localJoker.stake}
+                        />
                     </div>
 
                     {/* Settings on the right */}
