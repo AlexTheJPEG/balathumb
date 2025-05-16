@@ -22,9 +22,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
 
     // Load sticker image with caching
     const getStickerImage = async (stickerName: string, jokerId?: number) => {
-        const stickerPath = jokerId
-            ? getExceptionPath(jokerId, stickerName)
-            : `/stickers/${stickerName}.png`;
+        const stickerPath = jokerId ? getExceptionPath(jokerId, stickerName) : `/stickers/${stickerName}.png`;
 
         if (!stickerCache.has(stickerPath)) {
             stickerCache.set(stickerPath, await Jimp.read(stickerPath));
@@ -51,7 +49,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
         const edition = tJoker.edition || "";
         const originalWidth = 142;
         const originalHeight = 190;
-        
+
         const isWeeJoker = tJoker.joker.id === 124;
         // Use regular Joker's sprite position for Wee Joker
         const effectiveJokerId = isWeeJoker ? 1 : tJoker.joker.id;
@@ -101,8 +99,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     // Get layout data and z-orders
     const { scales, positions } = getJokerLayout(jokerList.length);
     const zOrders = calculateZOrders(jokerList.length);
-    const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i)
-        .sort((a, b) => zOrders[a] - zOrders[b]);
+    const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i).sort((a, b) => zOrders[a] - zOrders[b]);
 
     // Apply transformations and composite images in the correct order
     for (const idx of sortedIndices) {

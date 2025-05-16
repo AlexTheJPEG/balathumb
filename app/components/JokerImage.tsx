@@ -64,22 +64,26 @@ const JokerImage: React.FC<JokerImageProps> = ({
         return calculateSpriteStyle(effectiveJokerId, effectiveWidth, effectiveHeight, edition);
     }, [effectiveJokerId, effectiveWidth, effectiveHeight, edition]);
 
-    const containerStyle = isWeeJoker ? {
-        width: `${width}px`,
-        height: `${height}px`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    } : {
-        width: `${width}px`,
-        height: `${height}px`,
-    };
+    const containerStyle = isWeeJoker
+        ? {
+              width: `${width}px`,
+              height: `${height}px`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+          }
+        : {
+              width: `${width}px`,
+              height: `${height}px`,
+          };
 
-    const contentStyle = isWeeJoker ? {
-        width: `${effectiveWidth}px`,
-        height: `${effectiveHeight}px`,
-        position: 'relative' as const,
-    } : undefined;
+    const contentStyle = isWeeJoker
+        ? {
+              width: `${effectiveWidth}px`,
+              height: `${effectiveHeight}px`,
+              position: "relative" as const,
+          }
+        : undefined;
 
     return (
         <div className="relative" style={containerStyle}>

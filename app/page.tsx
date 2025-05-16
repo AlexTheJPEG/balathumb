@@ -35,7 +35,6 @@ interface SortableJokerProps {
     onJokerClick: (joker: ThumbJoker) => void;
 }
 
-// Sortable joker component
 function SortableJoker({
     tJoker,
     index,
@@ -120,7 +119,7 @@ function SortableJoker({
                     className="absolute top-0 right-0 z-20 flex h-6 w-6 translate-x-1/3 -translate-y-1/3 transform items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
                     aria-label="Remove joker"
                 >
-                    <span className="text-xs font-bold">×</span>
+                    <span className="text-xl font-bold">×</span>
                 </button>
             )}
         </div>
@@ -131,7 +130,6 @@ export default function Home() {
     const [jokerList, setJokerList] = useState<ThumbJoker[]>([]);
     const [isAnyJokerDragging, setIsAnyJokerDragging] = useState<boolean>(false);
     const [isJokerSelectorOpen, setIsJokerSelectorOpen] = useState<boolean>(false);
-    const [jokersDataPrefetched, setJokersDataPrefetched] = useState<boolean>(false);
     const [selectedJoker, setSelectedJoker] = useState<ThumbJoker | null>(null);
     const [selectedJokerIndex, setSelectedJokerIndex] = useState<number | null>(null);
     const [isJokerEditorOpen, setIsJokerEditorOpen] = useState<boolean>(false);
@@ -150,22 +148,6 @@ export default function Home() {
             coordinateGetter: sortableKeyboardCoordinates,
         }),
     );
-
-    // Add this new useEffect for prefetching
-    useEffect(() => {
-        // Prefetch joker data when component mounts
-        const prefetchJokerData = async () => {
-            try {
-                // Make a request to your API endpoint
-                await fetch("/api/jokers");
-                setJokersDataPrefetched(true);
-            } catch (error) {
-                console.error("Error prefetching joker data:", error);
-            }
-        };
-
-        prefetchJokerData();
-    }, []);
 
     // Function to remove a joker from the list
     const removeJoker = (indexToRemove: number) => {
@@ -218,7 +200,7 @@ export default function Home() {
         }
     };
 
-    // Add this function to handle image generation
+    // Handle image generation
     const handleGenerateImage = async () => {
         if (jokerList.length === 0) {
             alert("Please add at least one joker to generate a thumbnail.");
@@ -231,15 +213,11 @@ export default function Home() {
             // Use the existing loadImage function
             const base64Image = await loadImage(jokerList);
 
-            // Create a download link
-            const downloadLink = document.createElement("a");
-            downloadLink.href = base64Image;
-            downloadLink.download = `balathumb-${Date.now()}.png`;
-
-            // Append to body, click to trigger download, then remove
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            // Create and click a download link in one step
+            const a = document.createElement("a");
+            a.href = base64Image;
+            a.download = `balathumb-${Date.now()}.png`;
+            a.click();
         } catch (error) {
             console.error("Error generating image:", error);
             alert("Failed to generate image. Please try again.");
@@ -274,8 +252,8 @@ export default function Home() {
 
                 {/* Card organization */}
                 <div className="flex flex-col">
+                    {/* Joker list */}
                     <h2 className="mb-4 pt-0 text-3xl font-semibold">Jokers</h2>
-                    {/* Joker list with dnd kit */}
                     <div className="flex space-x-4" style={{ minWidth: "425px" }}>
                         <DndContext
                             sensors={sensors}
@@ -324,14 +302,14 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Joker Selector Modal */}
+            {/* Joker selector modal */}
             <JokerSelector
                 isVisible={isJokerSelectorOpen}
                 onSelect={handleJokerSelect}
                 onClose={() => setIsJokerSelectorOpen(false)}
             />
 
-            {/* Joker Detail Modal */}
+            {/* Joker editor modal */}
             <JokerEditor
                 isVisible={isJokerEditorOpen}
                 tJoker={selectedJoker}

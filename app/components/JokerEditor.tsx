@@ -59,7 +59,7 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
             >
                 <div className="flex items-start justify-between">
                     <h2 className="mb-4 text-2xl font-bold">{tJoker.joker.name}</h2>
-                    <button onClick={handleClose} className="text-xl text-gray-400 hover:text-white">
+                    <button onClick={handleClose} className="text-3xl leading-none text-gray-400 hover:text-white">
                         ×
                     </button>
                 </div>
@@ -81,103 +81,64 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                     <div className="flex-grow space-y-4">
                         {/* Edition selection */}
                         <div>
-                            <label className="mb-1 block text-lg font-bold text-white">Edition</label>
-                            <div className="mt-1">
-                                <div className="grid grid-cols-5 gap-4">
-                                    {["", ...EDITIONS].map((edition) => (
-                                        <div
-                                            key={edition}
-                                            className="text-center flex flex-col items-center cursor-pointer"
-                                            onClick={() => setLocalJoker({ ...localJoker, edition })}
-                                        >
-                                            <div className="flex-shrink-0">
-                                                <JokerImage joker={tJoker.joker} edition={edition} />
-                                            </div>
-                                            <label className="flex items-center justify-center mt-2 cursor-pointer">
-                                                <input
-                                                    type="radio"
-                                                    checked={localJoker.edition === edition}
-                                                    onChange={() => {
-                                                        setLocalJoker({ ...localJoker, edition });
-                                                    }}
-                                                    className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                                <span className="text-sm text-gray-300">
-                                                    {edition ? titleCase(edition) : "None"}
-                                                </span>
-                                            </label>
+                            <label className="mb-4 block text-lg font-bold text-white">Edition</label>
+                            <div className="grid grid-cols-5 gap-4">
+                                {["", ...EDITIONS].map((edition) => (
+                                    <div
+                                        key={edition}
+                                        className="text-center flex flex-col items-center cursor-pointer"
+                                        onClick={() => setLocalJoker({ ...localJoker, edition })}
+                                    >
+                                        <div className="flex-shrink-0">
+                                            <JokerImage joker={tJoker.joker} edition={edition} />
                                         </div>
-                                    ))}
-                                </div>
+                                        <label className="flex items-center justify-center mt-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                checked={localJoker.edition === edition}
+                                                onChange={() => {
+                                                    setLocalJoker({ ...localJoker, edition });
+                                                }}
+                                                className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                            <span className="text-sm text-gray-300">
+                                                {edition ? titleCase(edition) : "None"}
+                                            </span>
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                         {/* Sticker selection */}
                         <div>
-                            <label className="mb-1 block text-lg font-bold text-white">Stickers</label>
-                            <div className="mt-1">
-                                <div className="grid grid-cols-5 gap-4">
-                                    {STICKERS.map((sticker) => {
-                                        const toggleSticker = () => {
-                                            const newSticker = new Set(localJoker.sticker);
-                                            if (newSticker.has(sticker)) {
-                                                newSticker.delete(sticker);
-                                            } else {
-                                                // If adding eternal, remove perishable (and vice versa)
-                                                if (sticker === "eternal") {
-                                                    newSticker.delete("perishable");
-                                                } else if (sticker === "perishable") {
-                                                    newSticker.delete("eternal");
-                                                }
-                                                newSticker.add(sticker);
+                            <label className="mb-4 block text-lg font-bold text-white">Stickers</label>
+                            <div className="grid grid-cols-5 gap-4">
+                                {STICKERS.map((sticker) => {
+                                    const toggleSticker = () => {
+                                        const newSticker = new Set(localJoker.sticker);
+                                        if (newSticker.has(sticker)) {
+                                            newSticker.delete(sticker);
+                                        } else {
+                                            if (sticker === "eternal") {
+                                                newSticker.delete("perishable");
+                                            } else if (sticker === "perishable") {
+                                                newSticker.delete("eternal");
                                             }
-                                            setLocalJoker({ ...localJoker, sticker: newSticker });
-                                        };
+                                            newSticker.add(sticker);
+                                        }
+                                        setLocalJoker({ ...localJoker, sticker: newSticker });
+                                    };
 
-                                        return (
-                                            <div
-                                                key={sticker}
-                                                className="text-center flex flex-col items-center cursor-pointer"
-                                                onClick={toggleSticker}
-                                            >
-                                                <Image
-                                                    src={`/stickers/${sticker}_icon.png`}
-                                                    alt={`${sticker} sticker`}
-                                                    width={32}
-                                                    height={32}
-                                                    className="mb-2"
-                                                    unoptimized={true}
-                                                />
-                                                <label className="flex items-center justify-center mt-2 cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={localJoker.sticker.has(sticker)}
-                                                        onChange={toggleSticker}
-                                                        className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-                                                    <span className="text-sm text-gray-300">{titleCase(sticker)}</span>
-                                                </label>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                        {/* Stake sticker selection */}
-                        <div>
-                            <label className="mb-1 block text-lg font-bold text-white">Stake</label>
-                            <div className="mt-1">
-                                <div className="grid grid-cols-5 gap-4">
-                                    {["", ...STAKES].map((stake) => (
+                                    return (
                                         <div
-                                            key={stake}
+                                            key={sticker}
                                             className="text-center flex flex-col items-center cursor-pointer"
-                                            onClick={() => setLocalJoker({ ...localJoker, stake })}
+                                            onClick={toggleSticker}
                                         >
                                             <Image
-                                                src={`/stickers/${stake ? stake : "none"}_icon.png`}
-                                                alt={`${stake} sticker`}
+                                                src={`/stickers/${sticker}_icon.png`}
+                                                alt={`${sticker} sticker`}
                                                 width={32}
                                                 height={32}
                                                 className="mb-2"
@@ -185,21 +146,53 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                             />
                                             <label className="flex items-center justify-center mt-2 cursor-pointer">
                                                 <input
-                                                    type="radio"
-                                                    checked={localJoker.stake === stake}
-                                                    onChange={() => {
-                                                        setLocalJoker({ ...localJoker, stake });
-                                                    }}
+                                                    type="checkbox"
+                                                    checked={localJoker.sticker.has(sticker)}
+                                                    onChange={toggleSticker}
                                                     className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
-                                                <span className="text-sm text-gray-300">
-                                                    {stake ? titleCase(stake) : "None"}
-                                                </span>
+                                                <span className="text-sm text-gray-300">{titleCase(sticker)}</span>
                                             </label>
                                         </div>
-                                    ))}
-                                </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        {/* Stake sticker selection */}
+                        <div>
+                            <label className="mb-4 block text-lg font-bold text-white">Stake</label>
+                            <div className="grid grid-cols-5 gap-4">
+                                {["", ...STAKES].map((stake) => (
+                                    <div
+                                        key={stake}
+                                        className="text-center flex flex-col items-center cursor-pointer"
+                                        onClick={() => setLocalJoker({ ...localJoker, stake })}
+                                    >
+                                        <Image
+                                            src={`/stickers/${stake ? stake : "none"}_icon.png`}
+                                            alt={`${stake} sticker`}
+                                            width={32}
+                                            height={32}
+                                            className="mb-2"
+                                            unoptimized={true}
+                                        />
+                                        <label className="flex items-center justify-center mt-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                checked={localJoker.stake === stake}
+                                                onChange={() => {
+                                                    setLocalJoker({ ...localJoker, stake });
+                                                }}
+                                                className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                            <span className="text-sm text-gray-300">
+                                                {stake ? titleCase(stake) : "None"}
+                                            </span>
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
