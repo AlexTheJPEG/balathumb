@@ -14,6 +14,10 @@ export interface ThumbJoker {
 
 export const LEGENDARY_JOKERS = ["canio", "chicot", "perkeo", "triboulet", "yorick"];
 
+export const EDITIONS = ["foil", "holographic", "polychrome", "negative"];
+export const STICKERS = ["eternal", "perishable", "rental"];
+export const STAKES = ["white", "red", "green", "black", "blue", "purple", "orange", "gold"];
+
 export const jokers: Joker[] = [
     {
         id: 1,
