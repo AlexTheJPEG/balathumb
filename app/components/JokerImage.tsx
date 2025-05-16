@@ -4,6 +4,43 @@ import { Joker, LEGENDARY_JOKERS } from "../data/jokers";
 import Image from "next/image";
 import { useMemo } from "react";
 
+// Extract spritesheet calculation to be exportable
+export const calculateSpriteStyle = (
+    id: number, 
+    width: number, 
+    height: number, 
+    edition: string = ""
+) => {
+    const cols = 10;
+    const rows = 15;
+
+    // Original size in spritesheet
+    const origWidth = 142;
+    const origHeight = 190;
+
+    // Calculate position in spritesheet
+    const tileX = (id - 1) % cols;
+    const tileY = Math.floor((id - 1) / cols);
+
+    // Calculate the scale ratio for proper rendering
+    const scaleX = width / origWidth;
+    const scaleY = height / origHeight;
+
+    // The total dimensions of the scaled spritesheet
+    const totalWidth = cols * origWidth * scaleX;
+    const totalHeight = rows * origHeight * scaleY;
+
+    // Scale background-position based on the same ratio as the background-size
+    return {
+        backgroundImage: `url('/jokers/spritesheet${edition ? `_${edition}` : ""}.png')`,
+        backgroundPosition: `${-tileX * width}px ${-tileY * height}px`,
+        backgroundSize: `${totalWidth}px ${totalHeight}px`, // Specify both width and height
+        width: `${width}px`,
+        height: `${height}px`,
+        display: "block",
+    };
+};
+
 interface JokerImageProps {
     joker: Joker;
     width?: number;
@@ -23,36 +60,9 @@ const JokerImage: React.FC<JokerImageProps> = ({
 }) => {
     const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename);
 
-    // Calculate sprite position based on joker ID
+    // Use the exported function in the component
     const getSpriteStyle = useMemo(() => {
-        const cols = 10;
-        const rows = 15;
-
-        // Original size in spritesheet
-        const origWidth = 142;
-        const origHeight = 190;
-
-        // Calculate position in spritesheet
-        const tileX = (joker.id - 1) % cols;
-        const tileY = Math.floor((joker.id - 1) / cols);
-
-        // Calculate the scale ratio for proper rendering
-        const scaleX = width / origWidth;
-        const scaleY = height / origHeight;
-
-        // The total dimensions of the scaled spritesheet
-        const totalWidth = cols * origWidth * scaleX;
-        const totalHeight = rows * origHeight * scaleY;
-
-        // Scale background-position based on the same ratio as the background-size
-        return {
-            backgroundImage: `url('/jokers/spritesheet${edition ? `_${edition}` : ""}.png')`,
-            backgroundPosition: `${-tileX * width}px ${-tileY * height}px`,
-            backgroundSize: `${totalWidth}px ${totalHeight}px`, // Specify both width and height
-            width: `${width}px`,
-            height: `${height}px`,
-            display: "block",
-        };
+        return calculateSpriteStyle(joker.id, width, height, edition);
     }, [joker.id, width, height, edition]);
 
     if (isLegendaryJoker) {

@@ -2,34 +2,74 @@ import { getJokerLayout, calculateZOrders } from "./data/jokerLayouts";
 import { ThumbJoker, LEGENDARY_JOKERS } from "./data/jokers";
 import { ResizeStrategy } from "@jimp/plugin-resize";
 import { Jimp } from "jimp";
+import { calculateSpriteStyle } from "./components/JokerImage";
 
 export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const bgImage = await Jimp.read("/bg/bg_green.png");
     const result = bgImage.clone();
 
+    const baseSpritesheetCache = new Map<string, typeof Jimp.prototype>();
+    const stickerCache = new Map<string, typeof Jimp.prototype>();
+    
+    // Load base spritesheet
+    const getBaseSpritsheet = async (edition = "") => {
+        const key = edition ? `_${edition}` : "";
+        if (!baseSpritesheetCache.has(key)) {
+            baseSpritesheetCache.set(key, await Jimp.read(`/jokers/spritesheet${key}.png`));
+        }
+        return baseSpritesheetCache.get(key);
+    };
+
+    // Load sticker image with caching
+    const getStickerImage = async (stickerName: string) => {
+        if (!stickerCache.has(stickerName)) {
+            stickerCache.set(stickerName, await Jimp.read(`/stickers/${stickerName}.png`));
+        }
+        return stickerCache.get(stickerName);
+    };
+
     const jokerImages = [];
     for (const tJoker of jokerList) {
-        let jokerImage;
-        let finalJokerImage;
+        const edition = tJoker.edition || "";
+        const originalWidth = 142;  // Original size in spritesheet
+        const originalHeight = 190;
+        
+        // Use calculateSpriteStyle to get the spritesheet position
+        const spriteStyle = calculateSpriteStyle(
+            tJoker.joker.id,
+            originalWidth,
+            originalHeight,
+            edition
+        );
 
-        const edition = tJoker.edition ? `_${tJoker.edition}` : "";
+        const [backgroundPositionX, backgroundPositionY] = spriteStyle.backgroundPosition.split(" ");
+        const bgPosX = -parseInt(backgroundPositionX.replace("px", ""));
+        const bgPosY = -parseInt(backgroundPositionY.replace("px", ""));
+        
+        // Extract the joker from the spritesheet
+        const baseSheet = await getBaseSpritsheet(edition);
+        const finalJokerImage = baseSheet.clone();
+        finalJokerImage.crop({
+            x: bgPosX,
+            y: bgPosY,
+            w: originalWidth,
+            h: originalHeight
+        });
+
+        // For legendary jokers, add the sprite overlay
         if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
-            const baseImage = await Jimp.read(`/jokers/${tJoker.joker.filename}${edition}.png`);
             const spriteImage = await Jimp.read(`/jokers/${tJoker.joker.filename}_sprite.png`);
-            jokerImage = baseImage.clone();
-            jokerImage.composite(spriteImage, 0, 0);
-        } else {
-            jokerImage = await Jimp.read(`/jokers/${tJoker.joker.filename}${edition}.png`);
+            finalJokerImage.composite(spriteImage, 0, 0);
         }
 
         // Add stickers
-        finalJokerImage = jokerImage.clone();
         for (const sticker of tJoker.sticker) {
-            const stickerImage = await Jimp.read(`/stickers/${sticker}.png`);
+            const stickerImage = await getStickerImage(sticker);
             finalJokerImage.composite(stickerImage, 0, 0);
         }
+        
         if (tJoker.stake) {
-            const stakeImage = await Jimp.read(`/stickers/${tJoker.stake}.png`);
+            const stakeImage = await getStickerImage(tJoker.stake);
             finalJokerImage.composite(stakeImage, 0, 0);
         }
 
