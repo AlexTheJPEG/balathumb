@@ -2,8 +2,8 @@
 
 import { ThumbJoker, EDITIONS, STICKERS, STAKES } from "../data/jokers";
 import JokerImage from "./JokerImage";
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { titleCase } from "title-case";
 
 interface JokerEditorProps {
@@ -85,16 +85,13 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                             <div className="mt-1">
                                 <div className="grid grid-cols-5 gap-4">
                                     {["", ...EDITIONS].map((edition) => (
-                                        <div 
-                                            key={edition} 
+                                        <div
+                                            key={edition}
                                             className="text-center flex flex-col items-center cursor-pointer"
                                             onClick={() => setLocalJoker({ ...localJoker, edition })}
                                         >
                                             <div className="flex-shrink-0">
-                                                <JokerImage
-                                                    joker={tJoker.joker}
-                                                    edition={edition}
-                                                />
+                                                <JokerImage joker={tJoker.joker} edition={edition} />
                                             </div>
                                             <label className="flex items-center justify-center mt-2 cursor-pointer">
                                                 <input
@@ -106,7 +103,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                                     className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
-                                                <span className="text-sm text-gray-300">{edition ? titleCase(edition) : "None"}</span>
+                                                <span className="text-sm text-gray-300">
+                                                    {edition ? titleCase(edition) : "None"}
+                                                </span>
                                             </label>
                                         </div>
                                     ))}
@@ -125,10 +124,10 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                                 newSticker.delete(sticker);
                                             } else {
                                                 // If adding eternal, remove perishable (and vice versa)
-                                                if (sticker === 'eternal') {
-                                                    newSticker.delete('perishable');
-                                                } else if (sticker === 'perishable') {
-                                                    newSticker.delete('eternal');
+                                                if (sticker === "eternal") {
+                                                    newSticker.delete("perishable");
+                                                } else if (sticker === "perishable") {
+                                                    newSticker.delete("eternal");
                                                 }
                                                 newSticker.add(sticker);
                                             }
@@ -136,8 +135,8 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                         };
 
                                         return (
-                                            <div 
-                                                key={sticker} 
+                                            <div
+                                                key={sticker}
                                                 className="text-center flex flex-col items-center cursor-pointer"
                                                 onClick={toggleSticker}
                                             >
@@ -171,8 +170,8 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                             <div className="mt-1">
                                 <div className="grid grid-cols-5 gap-4">
                                     {["", ...STAKES].map((stake) => (
-                                        <div 
-                                            key={stake} 
+                                        <div
+                                            key={stake}
                                             className="text-center flex flex-col items-center cursor-pointer"
                                             onClick={() => setLocalJoker({ ...localJoker, stake })}
                                         >
@@ -194,7 +193,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                                     className="mr-2 h-4 w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
-                                                <span className="text-sm text-gray-300">{stake ? titleCase(stake) : "None"}</span>
+                                                <span className="text-sm text-gray-300">
+                                                    {stake ? titleCase(stake) : "None"}
+                                                </span>
                                             </label>
                                         </div>
                                     ))}

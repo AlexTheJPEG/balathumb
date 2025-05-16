@@ -92,7 +92,14 @@ function SortableJoker({
             {...attributes}
             {...listeners}
         >
-            <JokerImage joker={tJoker.joker} width={73} height={97} edition={tJoker.edition} />
+            <JokerImage
+                joker={tJoker.joker}
+                width={73}
+                height={97}
+                edition={tJoker.edition}
+                sticker={tJoker.sticker}
+                stake={tJoker.stake}
+            />
             {/* X button - only show when hovering AND not dragging AND no other joker is being dragged */}
             {isHovered && !isLoading && !isDragging && !isAnyJokerDragging && (
                 <button
