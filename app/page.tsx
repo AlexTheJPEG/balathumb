@@ -4,6 +4,7 @@ import JokerEditor from "./components/JokerEditor";
 import JokerImage from "./components/JokerImage";
 import JokerSelector from "./components/JokerSelector";
 import ThumbnailPreview from "./components/ThumbnailPreview";
+import ResponsiveThumbnailPreview from "./components/ResponsiveThumbnailPreview";
 import { ThumbJoker } from "./data/jokers";
 import { loadImage } from "./images";
 import {
@@ -227,13 +228,13 @@ export default function Home() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-start p-24">
-            <h1 className="text-5xl font-bold">Balathumb</h1>
+        <main className="flex min-h-screen flex-col items-center justify-start p-4 sm:p-8 lg:p-24">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">Balathumb</h1>
 
             {/* User interface */}
-            <div className="mt-16 -ml-64 flex items-start">
-                <div className="relative mr-8 flex flex-col items-center">
-                    <ThumbnailPreview jokerList={jokerList} width={640} height={360} />
+            <div className="mt-8 lg:mt-16 flex flex-col lg:flex-row items-center lg:items-start w-full max-w-7xl">
+                <div className="relative mb-8 lg:mb-0 lg:mr-8 flex flex-col items-center w-full lg:w-auto">
+                    <ResponsiveThumbnailPreview jokerList={jokerList} />
 
                     {/* Generate button */}
                     <button
@@ -251,10 +252,10 @@ export default function Home() {
                 </div>
 
                 {/* Card organization */}
-                <div className="flex flex-col">
+                <div className="flex flex-col w-full lg:w-auto border rounded-lg p-4 lg:p-8 bg-gray-700">
                     {/* Joker list */}
-                    <h2 className="mb-4 pt-0 text-3xl font-semibold">Jokers</h2>
-                    <div className="flex space-x-4" style={{ minWidth: "425px" }}>
+                    <h2 className="mb-4 pt-0 text-2xl sm:text-3xl font-semibold text-center lg:text-left">Jokers</h2>
+                    <div className="flex flex-wrap gap-4 justify-center lg:justify-start" style={{ minWidth: "auto" }}>
                         <DndContext
                             sensors={sensors}
                             collisionDetection={closestCenter}
