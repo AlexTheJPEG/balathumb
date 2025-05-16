@@ -4,7 +4,6 @@ import { Joker, LEGENDARY_JOKERS } from "../data/jokers";
 import Image from "next/image";
 import { useMemo } from "react";
 
-// Extract spritesheet calculation to be exportable
 export const calculateSpriteStyle = (id: number, width: number, height: number, edition: string = "") => {
     const cols = 10;
     const rows = 15;
@@ -29,7 +28,7 @@ export const calculateSpriteStyle = (id: number, width: number, height: number, 
     return {
         backgroundImage: `url('/jokers/spritesheet${edition ? `_${edition}` : ""}.png')`,
         backgroundPosition: `${-tileX * width}px ${-tileY * height}px`,
-        backgroundSize: `${totalWidth}px ${totalHeight}px`, // Specify both width and height
+        backgroundSize: `${totalWidth}px ${totalHeight}px`,
         width: `${width}px`,
         height: `${height}px`,
         display: "block",
@@ -45,6 +44,42 @@ interface JokerImageProps {
     stake?: string;
 }
 
+const StickerOverlays: React.FC<{ sticker: Set<string>; stake: string; width: number; height: number }> = ({
+    sticker,
+    stake,
+    width,
+    height,
+}) => (
+    <>
+        {/* Stickers */}
+        {Array.from(sticker).map((s, index) => (
+            <Image
+                key={index}
+                src={`/stickers/${s}.png`}
+                alt={s}
+                width={width}
+                height={height}
+                quality={100}
+                unoptimized={true}
+                className="absolute top-0 left-0"
+            />
+        ))}
+
+        {/* Stake stickers */}
+        {stake && (
+            <Image
+                src={`/stickers/${stake}.png`}
+                alt={stake}
+                width={width}
+                height={height}
+                quality={100}
+                unoptimized={true}
+                className="absolute top-0 left-0"
+            />
+        )}
+    </>
+);
+
 const JokerImage: React.FC<JokerImageProps> = ({
     joker,
     width = 73,
@@ -55,18 +90,21 @@ const JokerImage: React.FC<JokerImageProps> = ({
 }) => {
     const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename);
 
-    // Use the exported function in the component
     const getSpriteStyle = useMemo(() => {
         return calculateSpriteStyle(joker.id, width, height, edition);
     }, [joker.id, width, height, edition]);
 
-    if (isLegendaryJoker) {
-        return (
-            <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
-                {/* Base image from spritesheet */}
-                <div className="absolute top-0 left-0" style={getSpriteStyle} aria-label={`${joker.name} base`} />
+    return (
+        <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
+            {/* Base image from spritesheet */}
+            <div
+                className="absolute top-0 left-0"
+                style={getSpriteStyle}
+                aria-label={`${joker.name}${isLegendaryJoker ? ' base' : ''}`}
+            />
 
-                {/* Sprite overlay - still using individual image for legendary jokers */}
+            {/* Sprite overlay for legendary jokers */}
+            {isLegendaryJoker && (
                 <Image
                     src={`/jokers/${joker.filename}_sprite.png`}
                     alt={`${joker.name} sprite`}
@@ -76,69 +114,10 @@ const JokerImage: React.FC<JokerImageProps> = ({
                     unoptimized={true}
                     className="absolute top-0 left-0"
                 />
-
-                {/* Stickers */}
-                {Array.from(sticker).map((s, index) => (
-                    <Image
-                        key={index}
-                        src={`/stickers/${s}.png`}
-                        alt={s}
-                        width={width}
-                        height={height}
-                        quality={100}
-                        unoptimized={true}
-                        className="absolute top-0 left-0"
-                    />
-                ))}
-
-                {/* Stake stickers */}
-                {stake && (
-                    <Image
-                        src={`/stickers/${stake}.png`}
-                        alt={stake}
-                        width={width}
-                        height={height}
-                        quality={100}
-                        unoptimized={true}
-                        className="absolute top-0 left-0"
-                    />
-                )}
-            </div>
-        );
-    }
-
-    // Regular joker from spritesheet
-    return (
-        <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
-            {/* Base image from spritesheet */}
-            <div className="absolute top-0 left-0" style={getSpriteStyle} aria-label={joker.name} />
-
-            {/* Stickers */}
-            {Array.from(sticker).map((s, index) => (
-                <Image
-                    key={index}
-                    src={`/stickers/${s}.png`}
-                    alt={s}
-                    width={width}
-                    height={height}
-                    quality={100}
-                    unoptimized={true}
-                    className="absolute top-0 left-0"
-                />
-            ))}
-
-            {/* Stake stickers */}
-            {stake && (
-                <Image
-                    src={`/stickers/${stake}.png`}
-                    alt={stake}
-                    width={width}
-                    height={height}
-                    quality={100}
-                    unoptimized={true}
-                    className="absolute top-0 left-0"
-                />
             )}
+
+            {/* Common sticker overlays */}
+            <StickerOverlays sticker={sticker} stake={stake} width={width} height={height} />
         </div>
     );
 };
