@@ -21,11 +21,29 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     };
 
     // Load sticker image with caching
-    const getStickerImage = async (stickerName: string) => {
-        if (!stickerCache.has(stickerName)) {
-            stickerCache.set(stickerName, await Jimp.read(`/stickers/${stickerName}.png`));
+    const getStickerImage = async (stickerName: string, jokerId?: number) => {
+        const stickerPath = jokerId
+            ? getExceptionPath(jokerId, stickerName)
+            : `/stickers/${stickerName}.png`;
+
+        if (!stickerCache.has(stickerPath)) {
+            stickerCache.set(stickerPath, await Jimp.read(stickerPath));
         }
-        return stickerCache.get(stickerName);
+        return stickerCache.get(stickerPath);
+    };
+
+    // Helper function to determine exception paths
+    const getExceptionPath = (jokerId: number, stickerName: string) => {
+        if (jokerId === 16) {
+            return `/stickers/exceptions/half_joker_${stickerName}.png`;
+        }
+        if (jokerId === 65) {
+            return `/stickers/exceptions/square_joker_${stickerName}.png`;
+        }
+        if (jokerId === 78) {
+            return `/stickers/exceptions/photograph_${stickerName}.png`;
+        }
+        return `/stickers/${stickerName}.png`;
     };
 
     const jokerImages = [];
@@ -59,12 +77,12 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
 
         // Add stickers
         for (const sticker of tJoker.sticker) {
-            const stickerImage = await getStickerImage(sticker);
+            const stickerImage = await getStickerImage(sticker, tJoker.joker.id);
             finalJokerImage.composite(stickerImage, 0, 0);
         }
 
         if (tJoker.stake) {
-            const stakeImage = await getStickerImage(tJoker.stake);
+            const stakeImage = await getStickerImage(tJoker.stake, tJoker.joker.id);
             finalJokerImage.composite(stakeImage, 0, 0);
         }
 
