@@ -5,12 +5,7 @@ import Image from "next/image";
 import { useMemo } from "react";
 
 // Extract spritesheet calculation to be exportable
-export const calculateSpriteStyle = (
-    id: number, 
-    width: number, 
-    height: number, 
-    edition: string = ""
-) => {
+export const calculateSpriteStyle = (id: number, width: number, height: number, edition: string = "") => {
     const cols = 10;
     const rows = 15;
 

@@ -1,8 +1,8 @@
+import { calculateSpriteStyle } from "./components/JokerImage";
 import { getJokerLayout, calculateZOrders } from "./data/jokerLayouts";
 import { ThumbJoker, LEGENDARY_JOKERS } from "./data/jokers";
 import { ResizeStrategy } from "@jimp/plugin-resize";
 import { Jimp } from "jimp";
-import { calculateSpriteStyle } from "./components/JokerImage";
 
 export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const bgImage = await Jimp.read("/bg/bg_green.png");
@@ -10,7 +10,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
 
     const baseSpritesheetCache = new Map<string, typeof Jimp.prototype>();
     const stickerCache = new Map<string, typeof Jimp.prototype>();
-    
+
     // Load base spritesheet
     const getBaseSpritsheet = async (edition = "") => {
         const key = edition ? `_${edition}` : "";
@@ -31,21 +31,16 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const jokerImages = [];
     for (const tJoker of jokerList) {
         const edition = tJoker.edition || "";
-        const originalWidth = 142;  // Original size in spritesheet
+        const originalWidth = 142; // Original size in spritesheet
         const originalHeight = 190;
-        
+
         // Use calculateSpriteStyle to get the spritesheet position
-        const spriteStyle = calculateSpriteStyle(
-            tJoker.joker.id,
-            originalWidth,
-            originalHeight,
-            edition
-        );
+        const spriteStyle = calculateSpriteStyle(tJoker.joker.id, originalWidth, originalHeight, edition);
 
         const [backgroundPositionX, backgroundPositionY] = spriteStyle.backgroundPosition.split(" ");
         const bgPosX = -parseInt(backgroundPositionX.replace("px", ""));
         const bgPosY = -parseInt(backgroundPositionY.replace("px", ""));
-        
+
         // Extract the joker from the spritesheet
         const baseSheet = await getBaseSpritsheet(edition);
         const finalJokerImage = baseSheet.clone();
@@ -53,7 +48,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
             x: bgPosX,
             y: bgPosY,
             w: originalWidth,
-            h: originalHeight
+            h: originalHeight,
         });
 
         // For legendary jokers, add the sprite overlay
@@ -67,7 +62,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
             const stickerImage = await getStickerImage(sticker);
             finalJokerImage.composite(stickerImage, 0, 0);
         }
-        
+
         if (tJoker.stake) {
             const stakeImage = await getStickerImage(tJoker.stake);
             finalJokerImage.composite(stakeImage, 0, 0);
