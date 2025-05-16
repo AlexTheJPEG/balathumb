@@ -53,54 +53,79 @@ const JokerImage: React.FC<JokerImageProps> = ({
     stake = "",
 }) => {
     const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename);
+    const isWeeJoker = joker.id === 124;
+
+    // For Wee Joker, use regular Joker's sprite position and scale down the dimensions
+    const effectiveJokerId = isWeeJoker ? 1 : joker.id;
+    const effectiveWidth = isWeeJoker ? width * 0.6 : width;
+    const effectiveHeight = isWeeJoker ? height * 0.6 : height;
 
     const getSpriteStyle = useMemo(() => {
-        return calculateSpriteStyle(joker.id, width, height, edition);
-    }, [joker.id, width, height, edition]);
+        return calculateSpriteStyle(effectiveJokerId, effectiveWidth, effectiveHeight, edition);
+    }, [effectiveJokerId, effectiveWidth, effectiveHeight, edition]);
+
+    const containerStyle = isWeeJoker ? {
+        width: `${width}px`,
+        height: `${height}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    } : {
+        width: `${width}px`,
+        height: `${height}px`,
+    };
+
+    const contentStyle = isWeeJoker ? {
+        width: `${effectiveWidth}px`,
+        height: `${effectiveHeight}px`,
+        position: 'relative' as const,
+    } : undefined;
 
     return (
-        <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
-            {/* Base image from spritesheet */}
-            <div
-                className="absolute top-0 left-0"
-                style={getSpriteStyle}
-                aria-label={`${joker.name}${isLegendaryJoker ? " base" : ""}`}
-            />
-
-            {/* Sprite overlay for legendary jokers */}
-            {isLegendaryJoker && (
-                <Image
-                    src={`/jokers/${joker.filename}_sprite.png`}
-                    alt={`${joker.name} sprite`}
-                    width={width}
-                    height={height}
-                    quality={100}
-                    unoptimized={true}
+        <div className="relative" style={containerStyle}>
+            <div style={contentStyle}>
+                {/* Base image from spritesheet */}
+                <div
                     className="absolute top-0 left-0"
+                    style={getSpriteStyle}
+                    aria-label={`${joker.name}${isLegendaryJoker ? " base" : ""}`}
                 />
-            )}
 
-            {/* Stickers and stakes */}
-            {[...sticker, stake].filter(Boolean).map((s, index) => (
-                <Image
-                    key={index}
-                    src={`/stickers/${
-                        joker.id === 16
-                            ? `exceptions/half_joker_${s}`
-                            : joker.id === 65
-                              ? `exceptions/square_joker_${s}`
-                              : joker.id === 78
-                                ? `exceptions/photograph_${s}`
-                                : s
-                    }.png`}
-                    alt={s}
-                    width={width}
-                    height={height}
-                    quality={100}
-                    unoptimized={true}
-                    className="absolute top-0 left-0"
-                />
-            ))}
+                {/* Sprite overlay for legendary jokers */}
+                {isLegendaryJoker && (
+                    <Image
+                        src={`/jokers/${joker.filename}_sprite.png`}
+                        alt={`${joker.name} sprite`}
+                        width={effectiveWidth}
+                        height={effectiveHeight}
+                        quality={100}
+                        unoptimized={true}
+                        className="absolute top-0 left-0"
+                    />
+                )}
+
+                {/* Stickers and stakes */}
+                {[...sticker, stake].filter(Boolean).map((s, index) => (
+                    <Image
+                        key={index}
+                        src={`/stickers/${
+                            joker.id === 16
+                                ? `exceptions/half_joker_${s}`
+                                : joker.id === 65
+                                  ? `exceptions/square_joker_${s}`
+                                  : joker.id === 78
+                                    ? `exceptions/photograph_${s}`
+                                    : s
+                        }.png`}
+                        alt={s}
+                        width={effectiveWidth}
+                        height={effectiveHeight}
+                        quality={100}
+                        unoptimized={true}
+                        className="absolute top-0 left-0"
+                    />
+                ))}
+            </div>
         </div>
     );
 };

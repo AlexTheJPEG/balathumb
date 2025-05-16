@@ -49,11 +49,15 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
     const jokerImages = [];
     for (const tJoker of jokerList) {
         const edition = tJoker.edition || "";
-        const originalWidth = 142; // Original size in spritesheet
+        const originalWidth = 142;
         const originalHeight = 190;
+        
+        const isWeeJoker = tJoker.joker.id === 124;
+        // Use regular Joker's sprite position for Wee Joker
+        const effectiveJokerId = isWeeJoker ? 1 : tJoker.joker.id;
 
         // Use calculateSpriteStyle to get the spritesheet position
-        const spriteStyle = calculateSpriteStyle(tJoker.joker.id, originalWidth, originalHeight, edition);
+        const spriteStyle = calculateSpriteStyle(effectiveJokerId, originalWidth, originalHeight, edition);
 
         const [backgroundPositionX, backgroundPositionY] = spriteStyle.backgroundPosition.split(" ");
         const bgPosX = -parseInt(backgroundPositionX.replace("px", ""));
@@ -77,35 +81,40 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
 
         // Add stickers
         for (const sticker of tJoker.sticker) {
-            const stickerImage = await getStickerImage(sticker, tJoker.joker.id);
+            const stickerImage = await getStickerImage(sticker, effectiveJokerId);
             finalJokerImage.composite(stickerImage, 0, 0);
         }
 
         if (tJoker.stake) {
-            const stakeImage = await getStickerImage(tJoker.stake, tJoker.joker.id);
+            const stakeImage = await getStickerImage(tJoker.stake, effectiveJokerId);
             finalJokerImage.composite(stakeImage, 0, 0);
         }
 
+        // Remove the Wee Joker scaling from here
         jokerImages.push(finalJokerImage);
     }
 
     // Base sizes and positions calculations
     const baseJokerWidth = Math.floor(bgImage.width * 0.11);
-    const baseJokerHeight = Math.floor(baseJokerWidth * (97 / 73)); // Maintain aspect ratio
+    const baseJokerHeight = Math.floor(baseJokerWidth * (97 / 73));
 
-    // Get layout data from shared module
+    // Get layout data and z-orders
     const { scales, positions } = getJokerLayout(jokerList.length);
-
-    // Get z-order information from shared module
     const zOrders = calculateZOrders(jokerList.length);
-
-    // Sort joker indices by z-order (lower z-order gets drawn first)
-    const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i).sort((a, b) => zOrders[a] - zOrders[b]);
+    const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i)
+        .sort((a, b) => zOrders[a] - zOrders[b]);
 
     // Apply transformations and composite images in the correct order
     for (const idx of sortedIndices) {
-        const jokerWidth = Math.floor(baseJokerWidth * scales[idx].scale);
-        const jokerHeight = Math.floor(baseJokerHeight * scales[idx].scale);
+        const isWeeJoker = jokerList[idx].joker.id === 124;
+        let jokerWidth = Math.floor(baseJokerWidth * scales[idx].scale);
+        let jokerHeight = Math.floor(baseJokerHeight * scales[idx].scale);
+
+        // Apply Wee Joker scaling to the dimensions
+        if (isWeeJoker) {
+            jokerWidth = Math.floor(jokerWidth * 0.6);
+            jokerHeight = Math.floor(jokerHeight * 0.6);
+        }
 
         // Resize the joker
         jokerImages[idx].resize({
