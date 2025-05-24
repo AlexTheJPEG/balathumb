@@ -1,6 +1,9 @@
 import { jokers } from "@/app/data/jokers";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export async function GET() {
     try {
         // Get joker data from the jokers.ts file
