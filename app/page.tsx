@@ -3,7 +3,6 @@
 import JokerEditor from "./components/JokerEditor";
 import JokerImage from "./components/JokerImage";
 import JokerSelector from "./components/JokerSelector";
-import ThumbnailPreview from "./components/ThumbnailPreview";
 import ResponsiveThumbnailPreview from "./components/ResponsiveThumbnailPreview";
 import { ThumbJoker } from "./data/jokers";
 import { loadImage } from "./images";
