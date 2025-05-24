@@ -109,7 +109,7 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
                                 </div>
                                 <div className="mt-1 sm:mt-2 flex h-[43px] w-full items-start justify-center overflow-hidden">
                                     <p
-                                        className="w-full px-1 text-center text-xs sm:text-sm py-1 sm:py-2"
+                                        className="w-full px-1 text-center text-xs sm:text-lg py-1 sm:py-2"
                                         title={joker.name}
                                     >
                                         {joker.name}
