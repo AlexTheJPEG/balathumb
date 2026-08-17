@@ -285,6 +285,7 @@ export default function Home() {
                                 alt="Add Joker"
                                 width={73}
                                 height={97}
+                                style={{ width: "73px", height: "97px" }}
                                 className="cursor-pointer"
                                 onClick={() => {
                                     setIsJokerSelectorOpen(true);

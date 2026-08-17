@@ -102,8 +102,8 @@ const JokerImage: React.FC<JokerImageProps> = ({
                         alt={`${joker.name} sprite`}
                         width={effectiveWidth}
                         height={effectiveHeight}
-                        quality={100}
                         unoptimized={true}
+                        style={{ width: `${effectiveWidth}px`, height: `${effectiveHeight}px` }}
                         className="absolute top-0 left-0"
                     />
                 )}
@@ -124,8 +124,8 @@ const JokerImage: React.FC<JokerImageProps> = ({
                         alt={s}
                         width={effectiveWidth}
                         height={effectiveHeight}
-                        quality={100}
                         unoptimized={true}
+                        style={{ width: `${effectiveWidth}px`, height: `${effectiveHeight}px` }}
                         className="absolute top-0 left-0"
                     />
                 ))}

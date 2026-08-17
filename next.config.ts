@@ -5,17 +5,6 @@ const nextConfig: NextConfig = {
     images: {
         unoptimized: true,
     },
-    webpack: (config, { isServer }) => {
-        if (!isServer) {
-            config.resolve.fallback = {
-                fs: false,
-                path: false,
-                stream: false,
-                crypto: false,
-            };
-        }
-        return config;
-    },
     // Disable unnecessary features
     compress: true,
     poweredByHeader: false,

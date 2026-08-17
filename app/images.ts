@@ -1,137 +1,109 @@
-import { calculateSpriteStyle } from "./components/JokerImage";
 import { getJokerLayout, calculateZOrders } from "./data/jokerLayouts";
-import { ThumbJoker, LEGENDARY_JOKERS } from "./data/jokers";
-import { ResizeStrategy } from "@jimp/plugin-resize";
-import { Jimp } from "jimp";
+import { LEGENDARY_JOKERS, ThumbJoker } from "./data/jokers";
+
+const SPRITE_WIDTH = 142;
+const SPRITE_HEIGHT = 190;
+const SPRITES_PER_ROW = 10;
+
+function loadAsset(source: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`Unable to load image: ${source}`));
+        image.src = source;
+    });
+}
+
+function getStickerPath(jokerId: number, stickerName: string): string {
+    if (jokerId === 16) return `/stickers/exceptions/half_joker_${stickerName}.png`;
+    if (jokerId === 65) return `/stickers/exceptions/square_joker_${stickerName}.png`;
+    if (jokerId === 78) return `/stickers/exceptions/photograph_${stickerName}.png`;
+    return `/stickers/${stickerName}.png`;
+}
+
+function createCanvas(width: number, height: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas 2D context is unavailable");
+
+    context.imageSmoothingEnabled = false;
+    return [canvas, context];
+}
 
 export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
-    const bgImage = await Jimp.read("/bg/bg_green.png");
-    const result = bgImage.clone();
+    const assetCache = new Map<string, HTMLImageElement>();
+    const getAsset = async (source: string) => {
+        const cachedAsset = assetCache.get(source);
+        if (cachedAsset) return cachedAsset;
 
-    const baseSpritesheetCache = new Map<string, typeof Jimp.prototype>();
-    const stickerCache = new Map<string, typeof Jimp.prototype>();
-
-    // Load base spritesheet
-    const getBaseSpritsheet = async (edition = "") => {
-        const key = edition ? `_${edition}` : "";
-        if (!baseSpritesheetCache.has(key)) {
-            baseSpritesheetCache.set(key, await Jimp.read(`/jokers/spritesheet${key}.png`));
-        }
-        return baseSpritesheetCache.get(key);
+        const asset = await loadAsset(source);
+        assetCache.set(source, asset);
+        return asset;
     };
 
-    // Load sticker image with caching
-    const getStickerImage = async (stickerName: string, jokerId?: number) => {
-        const stickerPath = jokerId ? getExceptionPath(jokerId, stickerName) : `/stickers/${stickerName}.png`;
+    const background = await getAsset("/bg/bg_green.png");
+    const [result, resultContext] = createCanvas(background.naturalWidth, background.naturalHeight);
+    resultContext.drawImage(background, 0, 0);
 
-        if (!stickerCache.has(stickerPath)) {
-            stickerCache.set(stickerPath, await Jimp.read(stickerPath));
-        }
-        return stickerCache.get(stickerPath);
-    };
+    const jokerImages = await Promise.all(
+        jokerList.map(async (tJoker) => {
+            const isWeeJoker = tJoker.joker.id === 124;
+            const spriteId = isWeeJoker ? 1 : tJoker.joker.id;
+            const editionSuffix = tJoker.edition ? `_${tJoker.edition}` : "";
+            const spritesheet = await getAsset(`/jokers/spritesheet${editionSuffix}.png`);
+            const [jokerCanvas, jokerContext] = createCanvas(SPRITE_WIDTH, SPRITE_HEIGHT);
+            const spriteX = ((spriteId - 1) % SPRITES_PER_ROW) * SPRITE_WIDTH;
+            const spriteY = Math.floor((spriteId - 1) / SPRITES_PER_ROW) * SPRITE_HEIGHT;
 
-    // Helper function to determine exception paths
-    const getExceptionPath = (jokerId: number, stickerName: string) => {
-        if (jokerId === 16) {
-            return `/stickers/exceptions/half_joker_${stickerName}.png`;
-        }
-        if (jokerId === 65) {
-            return `/stickers/exceptions/square_joker_${stickerName}.png`;
-        }
-        if (jokerId === 78) {
-            return `/stickers/exceptions/photograph_${stickerName}.png`;
-        }
-        return `/stickers/${stickerName}.png`;
-    };
+            jokerContext.drawImage(
+                spritesheet,
+                spriteX,
+                spriteY,
+                SPRITE_WIDTH,
+                SPRITE_HEIGHT,
+                0,
+                0,
+                SPRITE_WIDTH,
+                SPRITE_HEIGHT,
+            );
 
-    const jokerImages = [];
-    for (const tJoker of jokerList) {
-        const edition = tJoker.edition || "";
-        const originalWidth = 142;
-        const originalHeight = 190;
+            if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
+                jokerContext.drawImage(await getAsset(`/jokers/${tJoker.joker.filename}_sprite.png`), 0, 0);
+            }
 
-        const isWeeJoker = tJoker.joker.id === 124;
-        // Use regular Joker's sprite position for Wee Joker
-        const effectiveJokerId = isWeeJoker ? 1 : tJoker.joker.id;
+            for (const sticker of [...tJoker.sticker, tJoker.stake].filter(Boolean)) {
+                jokerContext.drawImage(await getAsset(getStickerPath(spriteId, sticker)), 0, 0);
+            }
 
-        // Use calculateSpriteStyle to get the spritesheet position
-        const spriteStyle = calculateSpriteStyle(effectiveJokerId, originalWidth, originalHeight, edition);
+            return jokerCanvas;
+        }),
+    );
 
-        const [backgroundPositionX, backgroundPositionY] = spriteStyle.backgroundPosition.split(" ");
-        const bgPosX = -parseInt(backgroundPositionX.replace("px", ""));
-        const bgPosY = -parseInt(backgroundPositionY.replace("px", ""));
-
-        // Extract the joker from the spritesheet
-        const baseSheet = await getBaseSpritsheet(edition);
-        const finalJokerImage = baseSheet.clone();
-        finalJokerImage.crop({
-            x: bgPosX,
-            y: bgPosY,
-            w: originalWidth,
-            h: originalHeight,
-        });
-
-        // For legendary jokers, add the sprite overlay
-        if (LEGENDARY_JOKERS.includes(tJoker.joker.filename.toLowerCase())) {
-            const spriteImage = await Jimp.read(`/jokers/${tJoker.joker.filename}_sprite.png`);
-            finalJokerImage.composite(spriteImage, 0, 0);
-        }
-
-        // Add stickers
-        for (const sticker of tJoker.sticker) {
-            const stickerImage = await getStickerImage(sticker, effectiveJokerId);
-            finalJokerImage.composite(stickerImage, 0, 0);
-        }
-
-        if (tJoker.stake) {
-            const stakeImage = await getStickerImage(tJoker.stake, effectiveJokerId);
-            finalJokerImage.composite(stakeImage, 0, 0);
-        }
-
-        // Remove the Wee Joker scaling from here
-        jokerImages.push(finalJokerImage);
-    }
-
-    // Base sizes and positions calculations
-    const baseJokerWidth = Math.floor(bgImage.width * 0.11);
+    const baseJokerWidth = Math.floor(result.width * 0.11);
     const baseJokerHeight = Math.floor(baseJokerWidth * (97 / 73));
-
-    // Get layout data and z-orders
     const { scales, positions } = getJokerLayout(jokerList.length);
     const zOrders = calculateZOrders(jokerList.length);
-    const sortedIndices = Array.from({ length: jokerList.length }, (_, i) => i).sort((a, b) => zOrders[a] - zOrders[b]);
+    const sortedIndices = Array.from({ length: jokerList.length }, (_, index) => index).sort(
+        (a, b) => zOrders[a] - zOrders[b],
+    );
 
-    // Apply transformations and composite images in the correct order
-    for (const idx of sortedIndices) {
-        const isWeeJoker = jokerList[idx].joker.id === 124;
-        let jokerWidth = Math.floor(baseJokerWidth * scales[idx].scale);
-        let jokerHeight = Math.floor(baseJokerHeight * scales[idx].scale);
+    for (const index of sortedIndices) {
+        const { scale, rotation } = scales[index];
+        const isWeeJoker = jokerList[index].joker.id === 124;
+        const jokerWidth = Math.floor(baseJokerWidth * scale * (isWeeJoker ? 0.6 : 1));
+        const jokerHeight = Math.floor(baseJokerHeight * scale * (isWeeJoker ? 0.6 : 1));
+        const centerX = (result.width * positions[index].x) / 100;
+        const centerY = (result.height * positions[index].y) / 100;
 
-        // Apply Wee Joker scaling to the dimensions
-        if (isWeeJoker) {
-            jokerWidth = Math.floor(jokerWidth * 0.6);
-            jokerHeight = Math.floor(jokerHeight * 0.6);
-        }
-
-        // Resize the joker
-        jokerImages[idx].resize({
-            w: jokerWidth,
-            h: jokerHeight,
-            mode: ResizeStrategy.NEAREST_NEIGHBOR,
-        });
-
-        // Apply rotation
-        if (scales[idx].rotation !== 0) {
-            jokerImages[idx].rotate(-scales[idx].rotation);
-        }
-
-        // Calculate position (converting percentages to pixels and accounting for joker dimensions)
-        const xPos = Math.floor((bgImage.width * positions[idx].x) / 100 - jokerImages[idx].width / 2);
-        const yPos = Math.floor((bgImage.height * positions[idx].y) / 100 - jokerImages[idx].height / 2);
-
-        // Composite the joker onto the result
-        result.composite(jokerImages[idx], xPos, yPos);
+        resultContext.save();
+        resultContext.translate(centerX, centerY);
+        resultContext.rotate((rotation * Math.PI) / 180);
+        resultContext.drawImage(jokerImages[index], -jokerWidth / 2, -jokerHeight / 2, jokerWidth, jokerHeight);
+        resultContext.restore();
     }
 
-    return result.getBase64("image/png");
+    return result.toDataURL("image/png");
 }

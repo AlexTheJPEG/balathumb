@@ -25,6 +25,7 @@ const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, width = 
                 alt="Background"
                 width={width}
                 height={height}
+                loading="eager"
                 className="absolute top-0 left-0"
             />
 
