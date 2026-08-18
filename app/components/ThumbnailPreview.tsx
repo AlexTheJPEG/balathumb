@@ -1,3 +1,4 @@
+import { Background, getBackgroundPath } from "../data/backgrounds";
 import { getJokerLayout, calculateZOrders } from "../data/jokerLayouts";
 import { ThumbJoker } from "../data/jokers";
 import JokerImage from "./JokerImage";
@@ -5,11 +6,12 @@ import Image from "next/image";
 
 interface ThumbnailPreviewProps {
     jokerList: ThumbJoker[];
+    background: Background;
     width?: number;
     height?: number;
 }
 
-const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, width = 640, height = 360 }) => {
+const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, background, width = 640, height = 360 }) => {
     const { scales, positions } = getJokerLayout(jokerList.length);
     const zOrders = calculateZOrders(jokerList.length);
 
@@ -21,7 +23,7 @@ const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, width = 
         <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>
             {/* Background image */}
             <Image
-                src="/bg/bg_green.png"
+                src={getBackgroundPath(background)}
                 alt="Background"
                 width={width}
                 height={height}

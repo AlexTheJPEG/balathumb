@@ -1,9 +1,11 @@
 "use client";
 
+import BackgroundSelector from "./components/BackgroundSelector";
 import JokerEditor from "./components/JokerEditor";
 import JokerImage from "./components/JokerImage";
 import JokerSelector from "./components/JokerSelector";
 import ResponsiveThumbnailPreview from "./components/ResponsiveThumbnailPreview";
+import { backgrounds, Background, getBackgroundName } from "./data/backgrounds";
 import { ThumbJoker } from "./data/jokers";
 import { loadImage } from "./images";
 import {
@@ -146,6 +148,8 @@ export default function Home() {
     const [selectedJokerIndex, setSelectedJokerIndex] = useState<number | null>(null);
     const [isJokerEditorOpen, setIsJokerEditorOpen] = useState<boolean>(false);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
+    const [background, setBackground] = useState<Background>("shop");
+    const [isBackgroundSelectorOpen, setIsBackgroundSelectorOpen] = useState<boolean>(false);
 
     // Configure sensors for drag and drop
     const sensors = useSensors(
@@ -212,6 +216,11 @@ export default function Home() {
         }
     };
 
+    const cycleBackground = (direction: -1 | 1) => {
+        const currentIndex = backgrounds.indexOf(background);
+        setBackground(backgrounds[(currentIndex + direction + backgrounds.length) % backgrounds.length]);
+    };
+
     // Handle image generation
     const handleGenerateImage = async () => {
         if (jokerList.length === 0) {
@@ -223,7 +232,7 @@ export default function Home() {
 
         try {
             // Use the existing loadImage function
-            const base64Image = await loadImage(jokerList);
+            const base64Image = await loadImage(jokerList, background);
 
             // Create and click a download link in one step
             const a = document.createElement("a");
@@ -245,7 +254,52 @@ export default function Home() {
             {/* User interface */}
             <div className="mt-8 lg:mt-16 flex flex-col lg:flex-row items-center lg:items-start w-full max-w-7xl">
                 <div className="relative mb-8 lg:mb-0 lg:mr-8 flex flex-col items-center w-full lg:w-auto">
-                    <ResponsiveThumbnailPreview jokerList={jokerList} />
+                    <ResponsiveThumbnailPreview jokerList={jokerList} background={background} />
+
+                    <div className="mt-4 flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => cycleBackground(-1)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-gray-700 transition-colors hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                            aria-label="Previous background"
+                        >
+                            <svg
+                                aria-hidden="true"
+                                viewBox="0 0 24 24"
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="m15 18-6-6 6-6" />
+                            </svg>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setIsBackgroundSelectorOpen(true)}
+                            className="min-w-28 rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                            aria-label="Choose background"
+                        >
+                            {getBackgroundName(background)}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => cycleBackground(1)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-gray-700 transition-colors hover:bg-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                            aria-label="Next background"
+                        >
+                            <svg
+                                aria-hidden="true"
+                                viewBox="0 0 24 24"
+                                className="h-5 w-5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="m9 18 6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
 
                     {/* Generate button */}
                     <button
@@ -314,6 +368,15 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            <BackgroundSelector
+                isVisible={isBackgroundSelectorOpen}
+                onSelect={(selectedBackground) => {
+                    setBackground(selectedBackground);
+                    setIsBackgroundSelectorOpen(false);
+                }}
+                onClose={() => setIsBackgroundSelectorOpen(false)}
+            />
 
             {/* Joker selector modal */}
             <JokerSelector

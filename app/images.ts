@@ -1,3 +1,4 @@
+import { Background, getBackgroundPath } from "./data/backgrounds";
 import { getJokerLayout, calculateZOrders } from "./data/jokerLayouts";
 import { LEGENDARY_JOKERS, ThumbJoker } from "./data/jokers";
 
@@ -33,7 +34,7 @@ function createCanvas(width: number, height: number): [HTMLCanvasElement, Canvas
     return [canvas, context];
 }
 
-export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
+export async function loadImage(jokerList: ThumbJoker[], backgroundName: Background): Promise<string> {
     const assetCache = new Map<string, HTMLImageElement>();
     const getAsset = async (source: string) => {
         const cachedAsset = assetCache.get(source);
@@ -44,7 +45,7 @@ export async function loadImage(jokerList: ThumbJoker[]): Promise<string> {
         return asset;
     };
 
-    const background = await getAsset("/bg/bg_green.png");
+    const background = await getAsset(getBackgroundPath(backgroundName));
     const [result, resultContext] = createCanvas(background.naturalWidth, background.naturalHeight);
     resultContext.drawImage(background, 0, 0);
 
