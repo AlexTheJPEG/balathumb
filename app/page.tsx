@@ -91,37 +91,49 @@ function SortableJoker({
             {...attributes}
             {...listeners}
         >
-            <JokerImage
-                joker={tJoker.joker}
-                width={73}
-                height={97}
-                edition={tJoker.edition}
-                sticker={tJoker.sticker}
-                stake={tJoker.stake}
-            />
-            {/* X button - only show when hovering AND not dragging AND no other joker is being dragged */}
-            {isHovered && !isLoading && !isDragging && !isAnyJokerDragging && (
-                <button
-                    onClick={(e) => {
-                        // Prevent drag from starting when clicking the remove button
-                        e.stopPropagation();
-                        e.preventDefault();
-                        removeJoker(index);
-                    }}
-                    onMouseDown={(e) => {
-                        // Prevent drag from starting when clicking the remove button
-                        e.stopPropagation();
-                    }}
-                    onPointerDown={(e) => {
-                        // Prevent drag from starting when clicking the remove button
-                        e.stopPropagation();
-                    }}
-                    className="absolute top-0 right-0 z-20 flex h-6 w-6 translate-x-1/3 -translate-y-1/3 transform items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
-                    aria-label="Remove joker"
-                >
-                    <span className="text-xl font-bold">×</span>
-                </button>
-            )}
+            <div className="relative transition-transform duration-150 ease-out hover:scale-105">
+                <JokerImage
+                    joker={tJoker.joker}
+                    width={73}
+                    height={97}
+                    edition={tJoker.edition}
+                    sticker={tJoker.sticker}
+                    stake={tJoker.stake}
+                />
+                {/* X button - only show when hovering AND not dragging AND no other joker is being dragged */}
+                {isHovered && !isLoading && !isDragging && !isAnyJokerDragging && (
+                    <button
+                        onClick={(e) => {
+                            // Prevent drag from starting when clicking the remove button
+                            e.stopPropagation();
+                            e.preventDefault();
+                            removeJoker(index);
+                        }}
+                        onMouseDown={(e) => {
+                            // Prevent drag from starting when clicking the remove button
+                            e.stopPropagation();
+                        }}
+                        onPointerDown={(e) => {
+                            // Prevent drag from starting when clicking the remove button
+                            e.stopPropagation();
+                        }}
+                        className="absolute top-0 right-0 z-20 inline-flex h-7 w-7 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded-full bg-red-500/90 text-white shadow-sm ring-2 ring-gray-700 transition duration-150 hover:scale-110 hover:bg-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        aria-label="Remove Joker"
+                        title="Remove Joker"
+                    >
+                        <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                        >
+                            <path d="m6 6 12 12M18 6 6 18" />
+                        </svg>
+                    </button>
+                )}
+            </div>
         </div>
     );
 }
@@ -286,7 +298,7 @@ export default function Home() {
                                 width={73}
                                 height={97}
                                 style={{ width: "73px", height: "97px" }}
-                                className="cursor-pointer"
+                                className="cursor-pointer transition-transform duration-150 ease-out hover:scale-105"
                                 onClick={() => {
                                     setIsJokerSelectorOpen(true);
                                 }}

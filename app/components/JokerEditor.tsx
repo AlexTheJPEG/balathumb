@@ -63,8 +63,23 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
             >
                 <div className="flex items-start justify-between">
                     <h2 className="mb-4 text-xl sm:text-2xl font-bold">{tJoker.joker.name}</h2>
-                    <button onClick={handleClose} className="text-2xl sm:text-3xl leading-none text-gray-400 hover:text-white">
-                        ×
+                    <button
+                        type="button"
+                        onClick={handleClose}
+                        className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition duration-150 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                        aria-label="Close Joker editor"
+                        title="Close"
+                    >
+                        <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            className="h-5 w-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                        >
+                            <path d="m6 6 12 12M18 6 6 18" />
+                        </svg>
                     </button>
                 </div>
 
@@ -85,7 +100,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                     <div className="flex-grow space-y-4">
                         {/* Edition selection */}
                         <div>
-                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">Edition</label>
+                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">
+                                Edition
+                            </label>
                             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                                 {["", ...EDITIONS].map((edition) => (
                                     <div
@@ -117,7 +134,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
 
                         {/* Sticker selection */}
                         <div>
-                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">Stickers</label>
+                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">
+                                Stickers
+                            </label>
                             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                                 {STICKERS.map((sticker) => {
                                     const toggleSticker = () => {
@@ -157,7 +176,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
                                                     className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
-                                                <span className="text-xs sm:text-sm text-gray-300">{titleCase(sticker)}</span>
+                                                <span className="text-xs sm:text-sm text-gray-300">
+                                                    {titleCase(sticker)}
+                                                </span>
                                             </label>
                                         </div>
                                     );
@@ -167,7 +188,9 @@ const JokerEditor: React.FC<JokerEditorProps> = ({ isVisible, tJoker, onClose, o
 
                         {/* Stake selection */}
                         <div>
-                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">Stake</label>
+                            <label className="mb-2 sm:mb-4 block text-base sm:text-lg font-bold text-white">
+                                Stake
+                            </label>
                             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                                 {["", ...STAKES].map((stake) => (
                                     <div

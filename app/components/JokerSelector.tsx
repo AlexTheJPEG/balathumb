@@ -62,16 +62,27 @@ const JokerSelector: React.FC<JokerSelectorProps> = ({ isVisible, onSelect, onCl
             onClick={handleBackdropClick}
         >
             <div
-                className={`max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-gray-800 p-4 sm:p-6 transition-transform duration-200 ease-in-out ${
+                className={`relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-lg bg-gray-800 p-4 sm:p-6 transition-transform duration-200 ease-in-out ${
                     isVisible ? "scale-100 transform" : "scale-95 transform"
                 }`}
             >
-                {/* Close button */}
                 <button
+                    type="button"
                     onClick={onClose}
-                    className="absolute top-2 right-2 sm:top-4 sm:right-4 text-3xl leading-none text-gray-400 hover:text-white"
+                    className="absolute top-3 right-3 inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition duration-150 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:top-5 sm:right-5"
+                    aria-label="Close Joker selector"
+                    title="Close"
                 >
-                    ×
+                    <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                    >
+                        <path d="m6 6 12 12M18 6 6 18" />
+                    </svg>
                 </button>
 
                 <h2 className="mb-4 text-xl sm:text-2xl font-bold">Select a Joker</h2>
