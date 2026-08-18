@@ -1,5 +1,6 @@
 import { Background } from "../data/backgrounds";
 import { ThumbJoker } from "../data/jokers";
+import { THUMBNAIL_ASPECT_RATIO, THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH } from "../data/thumbnail";
 import ThumbnailPreview from "./ThumbnailPreview";
 import { useEffect, useState } from "react";
 
@@ -9,15 +10,14 @@ interface ResponsiveThumbnailPreviewProps {
 }
 
 export default function ResponsiveThumbnailPreview({ jokerList, background }: ResponsiveThumbnailPreviewProps) {
-    const [dimensions, setDimensions] = useState({ width: 640, height: 360 });
+    const [dimensions, setDimensions] = useState({ width: THUMBNAIL_WIDTH, height: THUMBNAIL_HEIGHT });
 
     useEffect(() => {
         const updateDimensions = () => {
-            const containerWidth = Math.min(window.innerWidth - 32, 640);
-            const aspectRatio = 16 / 9;
+            const containerWidth = Math.min(window.innerWidth - 32, THUMBNAIL_WIDTH);
             setDimensions({
                 width: containerWidth,
-                height: containerWidth / aspectRatio,
+                height: containerWidth / THUMBNAIL_ASPECT_RATIO,
             });
         };
 

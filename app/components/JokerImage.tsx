@@ -1,28 +1,33 @@
 "use client";
 
-import { Joker, LEGENDARY_JOKERS } from "../data/jokers";
+import {
+    Joker,
+    JOKER_SPRITE_HEIGHT,
+    JOKER_SPRITE_WIDTH,
+    JOKER_SPRITE_ROWS,
+    JOKER_SPRITES_PER_ROW,
+    LEGENDARY_JOKERS,
+    STICKER_OFFSET_Y,
+    WEE_JOKER_ID,
+    WEE_JOKER_SCALE,
+    WEE_JOKER_SPRITE_ID,
+} from "../data/jokers";
+import { JOKER_DISPLAY_HEIGHT, JOKER_DISPLAY_WIDTH } from "../data/thumbnail";
 import Image from "next/image";
 import { useMemo } from "react";
 
 export const calculateSpriteStyle = (id: number, width: number, height: number, edition: string = "") => {
-    const cols = 10;
-    const rows = 15;
-
-    // Original size in spritesheet
-    const origWidth = 142;
-    const origHeight = 190;
-
     // Calculate position in spritesheet
-    const tileX = (id - 1) % cols;
-    const tileY = Math.floor((id - 1) / cols);
+    const tileX = (id - 1) % JOKER_SPRITES_PER_ROW;
+    const tileY = Math.floor((id - 1) / JOKER_SPRITES_PER_ROW);
 
     // Calculate the scale ratio for proper rendering
-    const scaleX = width / origWidth;
-    const scaleY = height / origHeight;
+    const scaleX = width / JOKER_SPRITE_WIDTH;
+    const scaleY = height / JOKER_SPRITE_HEIGHT;
 
     // The total dimensions of the scaled spritesheet
-    const totalWidth = cols * origWidth * scaleX;
-    const totalHeight = rows * origHeight * scaleY;
+    const totalWidth = JOKER_SPRITES_PER_ROW * JOKER_SPRITE_WIDTH * scaleX;
+    const totalHeight = JOKER_SPRITE_ROWS * JOKER_SPRITE_HEIGHT * scaleY;
 
     // Scale background-position based on the same ratio as the background-size
     return {
@@ -46,19 +51,19 @@ interface JokerImageProps {
 
 const JokerImage: React.FC<JokerImageProps> = ({
     joker,
-    width = 73,
-    height = 97,
+    width = JOKER_DISPLAY_WIDTH,
+    height = JOKER_DISPLAY_HEIGHT,
     edition = "",
     sticker = new Set(),
     stake = "",
 }) => {
     const isLegendaryJoker = LEGENDARY_JOKERS.includes(joker.filename);
-    const isWeeJoker = joker.id === 124;
+    const isWeeJoker = joker.id === WEE_JOKER_ID;
 
     // For Wee Joker, use regular Joker's sprite position and scale down the dimensions
-    const effectiveJokerId = isWeeJoker ? 1 : joker.id;
-    const effectiveWidth = isWeeJoker ? width * 0.6 : width;
-    const effectiveHeight = isWeeJoker ? height * 0.6 : height;
+    const effectiveJokerId = isWeeJoker ? WEE_JOKER_SPRITE_ID : joker.id;
+    const effectiveWidth = isWeeJoker ? width * WEE_JOKER_SCALE : width;
+    const effectiveHeight = isWeeJoker ? height * WEE_JOKER_SCALE : height;
 
     const getSpriteStyle = useMemo(() => {
         return calculateSpriteStyle(effectiveJokerId, effectiveWidth, effectiveHeight, edition);
@@ -112,20 +117,16 @@ const JokerImage: React.FC<JokerImageProps> = ({
                 {[...sticker, stake].filter(Boolean).map((s, index) => (
                     <Image
                         key={index}
-                        src={`/stickers/${
-                            joker.id === 16
-                                ? `exceptions/half_joker_${s}`
-                                : joker.id === 65
-                                  ? `exceptions/square_joker_${s}`
-                                  : joker.id === 78
-                                    ? `exceptions/photograph_${s}`
-                                    : s
-                        }.png`}
+                        src={`/stickers/${s}.png`}
                         alt={s}
                         width={effectiveWidth}
                         height={effectiveHeight}
                         unoptimized={true}
-                        style={{ width: `${effectiveWidth}px`, height: `${effectiveHeight}px` }}
+                        style={{
+                            width: `${effectiveWidth}px`,
+                            height: `${effectiveHeight}px`,
+                            transform: `translateY(${(STICKER_OFFSET_Y[joker.id] ?? 0) * (effectiveHeight / JOKER_SPRITE_HEIGHT)}px)`,
+                        }}
                         className="absolute top-0 left-0"
                     />
                 ))}

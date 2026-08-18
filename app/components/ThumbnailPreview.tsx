@@ -1,6 +1,12 @@
 import { Background, getBackgroundPath } from "../data/backgrounds";
 import { getJokerLayout, calculateZOrders } from "../data/jokerLayouts";
 import { ThumbJoker } from "../data/jokers";
+import {
+    JOKER_DISPLAY_ASPECT_RATIO,
+    THUMBNAIL_HEIGHT,
+    THUMBNAIL_JOKER_WIDTH_RATIO,
+    THUMBNAIL_WIDTH,
+} from "../data/thumbnail";
 import JokerImage from "./JokerImage";
 import Image from "next/image";
 
@@ -11,13 +17,18 @@ interface ThumbnailPreviewProps {
     height?: number;
 }
 
-const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({ jokerList, background, width = 640, height = 360 }) => {
+const ThumbnailPreview: React.FC<ThumbnailPreviewProps> = ({
+    jokerList,
+    background,
+    width = THUMBNAIL_WIDTH,
+    height = THUMBNAIL_HEIGHT,
+}) => {
     const { scales, positions } = getJokerLayout(jokerList.length);
     const zOrders = calculateZOrders(jokerList.length);
 
     // Calculate the base joker size based on thumbnail width
-    const baseJokerWidth = Math.floor(width * 0.11);
-    const baseJokerHeight = Math.floor(baseJokerWidth * (97 / 73)); // Maintain aspect ratio
+    const baseJokerWidth = Math.floor(width * THUMBNAIL_JOKER_WIDTH_RATIO);
+    const baseJokerHeight = Math.floor(baseJokerWidth * JOKER_DISPLAY_ASPECT_RATIO); // Maintain aspect ratio
 
     return (
         <div className="relative" style={{ width: `${width}px`, height: `${height}px` }}>

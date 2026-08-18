@@ -17,6 +17,18 @@ export const LEGENDARY_JOKERS = ["canio", "chicot", "perkeo", "triboulet", "yori
 export const EDITIONS = ["foil", "holographic", "polychrome", "negative"];
 export const STICKERS = ["eternal", "perishable", "rental"];
 export const STAKES = ["white", "red", "green", "black", "blue", "purple", "orange", "gold"];
+export const STICKER_OFFSET_Y: Record<number, number> = {
+    16: 33,
+    65: 24,
+    78: 15,
+};
+export const JOKER_SPRITE_WIDTH = 142;
+export const JOKER_SPRITE_HEIGHT = 190;
+export const JOKER_SPRITES_PER_ROW = 10;
+export const JOKER_SPRITE_ROWS = 15;
+export const WEE_JOKER_ID = 124;
+export const WEE_JOKER_SPRITE_ID = 1;
+export const WEE_JOKER_SCALE = 0.6;
 
 export const jokers: Joker[] = [
     {

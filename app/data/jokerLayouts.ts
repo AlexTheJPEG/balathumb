@@ -2,6 +2,8 @@
  * Configuration for joker positioning and scaling based on the number of jokers
  */
 
+export const MAX_JOKERS = 5;
+
 export interface JokerScale {
     scale: number;
     rotation: number;
@@ -66,7 +68,7 @@ export function getJokerLayout(jokerCount: number): JokerLayout {
                     { x: 84, y: 50 },
                 ],
             };
-        case 5:
+        case MAX_JOKERS:
             return {
                 scales: [
                     { scale: 2, rotation: -7.5 },

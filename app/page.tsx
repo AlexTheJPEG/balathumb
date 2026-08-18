@@ -6,7 +6,9 @@ import JokerImage from "./components/JokerImage";
 import JokerSelector from "./components/JokerSelector";
 import ResponsiveThumbnailPreview from "./components/ResponsiveThumbnailPreview";
 import { backgrounds, Background, getBackgroundName } from "./data/backgrounds";
+import { MAX_JOKERS } from "./data/jokerLayouts";
 import { ThumbJoker } from "./data/jokers";
+import { JOKER_DISPLAY_HEIGHT, JOKER_DISPLAY_WIDTH } from "./data/thumbnail";
 import { loadImage } from "./images";
 import {
     DndContext,
@@ -96,8 +98,8 @@ function SortableJoker({
             <div className="relative transition-transform duration-150 ease-out hover:scale-105">
                 <JokerImage
                     joker={tJoker.joker}
-                    width={73}
-                    height={97}
+                    width={JOKER_DISPLAY_WIDTH}
+                    height={JOKER_DISPLAY_HEIGHT}
                     edition={tJoker.edition}
                     sticker={tJoker.sticker}
                     stake={tJoker.stake}
@@ -194,7 +196,7 @@ export default function Home() {
 
     // Handle joker selection
     const handleJokerSelect = (joker: ThumbJoker) => {
-        if (jokerList.length < 5) {
+        if (jokerList.length < MAX_JOKERS) {
             setJokerList([...jokerList, joker]);
         }
         setIsJokerSelectorOpen(false);
@@ -345,13 +347,13 @@ export default function Home() {
                             </SortableContext>
                         </DndContext>
 
-                        {jokerList.length < 5 && (
+                        {jokerList.length < MAX_JOKERS && (
                             <Image
                                 src="/add.png"
                                 alt="Add Joker"
-                                width={73}
-                                height={97}
-                                style={{ width: "73px", height: "97px" }}
+                                width={JOKER_DISPLAY_WIDTH}
+                                height={JOKER_DISPLAY_HEIGHT}
+                                style={{ width: `${JOKER_DISPLAY_WIDTH}px`, height: `${JOKER_DISPLAY_HEIGHT}px` }}
                                 className="cursor-pointer transition-transform duration-150 ease-out hover:scale-105"
                                 onClick={() => {
                                     setIsJokerSelectorOpen(true);
@@ -360,11 +362,18 @@ export default function Home() {
                         )}
 
                         {/* Add invisible placeholder jokers to maintain layout */}
-                        {Array.from({ length: Math.max(0, 5 - jokerList.length - (jokerList.length < 5 ? 1 : 0)) }).map(
-                            (_, index) => (
-                                <div key={`placeholder-${index}`} className="invisible h-[97px] w-[73px]" />
+                        {Array.from({
+                            length: Math.max(
+                                0,
+                                MAX_JOKERS - jokerList.length - (jokerList.length < MAX_JOKERS ? 1 : 0),
                             ),
-                        )}
+                        }).map((_, index) => (
+                            <div
+                                key={`placeholder-${index}`}
+                                className="invisible"
+                                style={{ width: JOKER_DISPLAY_WIDTH, height: JOKER_DISPLAY_HEIGHT }}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>
